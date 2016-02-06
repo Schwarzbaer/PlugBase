@@ -7,9 +7,8 @@ sys.path.insert(0, "/home/baribal/src/LUI/Builtin")
 
 from direct.showbase.DirectObject import DirectObject
 
-from panda3d.lui import LUIRegion, LUIObject, LUIInputHandler, LUISprite
+from panda3d.lui import LUIRegion, LUIObject, LUIInputHandler, LUISprite, LUIVerticalLayout
 from LUISkin import LUIDefaultSkin
-from LUILayouts import LUIVerticalLayout
 from LUIFrame import LUIFrame
 from LUIScrollableRegion import LUIScrollableRegion
 from LUIInputField import LUIInputField
@@ -105,20 +104,17 @@ class ConsoleGUI:
                                       #style = LUIFrame.FS_sunken,
                                       margin = (5, 5, 5, 5),
                                       )
-        console = LUIVerticalLayout(parent = self.console_frame,
-                                    spacing = 3,
-                                    use_dividers = True,
-                                    margin = (0, 0, 0, 0),
-                                    width = self.console_frame.width,
-                                    )
+        console = LUIVerticalLayout(parent = self.console_frame, spacing = 3)
+        #console.use_dividers = True
+        console.margin = (0, 0, 0, 0)
+        console.width = self.console_frame.width
         
         self.history_region = LUIScrollableRegion(margin = 0, width = console.width - 10)
         console.add(self.history_region)
         self.history = LUIVerticalLayout(parent = self.history_region.content_node,
-                                    spacing = 2,
-                                    use_dividers = True,
-                                    margin = (0, 0, 0, 0),
-                                    width = self.history_region.width)
+                                         spacing = 2)
+        self.history.margin = (0, 0, 0, 0)
+        self.history.width = self.history_region.width
 
         self.command_line = LUIInputField(width = console.width - 10)
         console.add(self.command_line)
