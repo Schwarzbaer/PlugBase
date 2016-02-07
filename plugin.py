@@ -104,8 +104,13 @@ class call_on_change(DirectObject):
         return wrapped_func
         
     def call_wrapped_func(self, section, variable, value):
+        print("@call_on_change(%s, %s, %s, %s)" % (repr(self),
+                                                   repr(section),
+                                                   repr(variable),
+                                                   repr(value)))
         if (section, variable) == (self.section, self.variable):
-            self.wrapped_func(value)
+            print("Sending on to %s" % (repr(self.wrapped_func)))
+            self.wrapped_func(self, value)
             
 class configargs(object):
     """

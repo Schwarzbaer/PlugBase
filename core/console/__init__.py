@@ -37,7 +37,9 @@ global plugin_manager # Set by the plugin_manager, used from within the Interact
 
 def init():
     global console
+    from plugin import config_manager
     console = Console(interpreter_locals = dict(pm = plugin_manager,
+                                                cm = config_manager,
                                                 console_command = ConsoleCommands()))
 
 def destroy():

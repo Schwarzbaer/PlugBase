@@ -14,7 +14,11 @@ global smiley
 
 def init():
     global smiley
-    smiley = DemoSmiley()
+    smiley1 = DemoSmiley()
+    smiley2 = DemoSmiley()
+    print("Smiley obj: "+str(smiley1))
+    print("Smiley obj: "+str(smiley2))
+    smiley2.model.set_pos(1,0,0)
 
 def destroy():
     global smiley
@@ -47,6 +51,7 @@ class DemoSmiley(DirectObject):
     
     @call_on_change("demo_smiley", "rotation_speed")
     def set_rotation_speed(self, value):
+        print("Setting rotation speed to %d" % (value, ))
         self.rotation_speed = value
     
     def destroy(self):
