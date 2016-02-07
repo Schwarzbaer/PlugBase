@@ -40,7 +40,7 @@ class PlugBase(ShowBase):
         #plugin_manager.load_plugins()
         configs = []
         if underlay_default_conf:
-            framework_conf = os.path.abspath(__file__) + "core.cfg"
+            framework_conf = os.path.dirname(os.path.abspath(__file__)) + "/core.cfg"
             configs.append(framework_conf)
         if config_file is not None:
             configs.append(config_file)

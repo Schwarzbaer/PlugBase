@@ -11,7 +11,7 @@ from LUIScrollableRegion import LUIScrollableRegion
 from LUIInputField import LUIInputField
 from LUIFormattedLabel import LUIFormattedLabel
 
-from core.config_manager import configargs, get_config_value#, call_on_change
+from plugin import configargs, get_config_value#, call_on_change
 
 global base # This is just to suppress Eclipse error indicators
 

@@ -3,7 +3,7 @@ implements = "demo_button"
 
 from direct.gui.DirectGui import DirectButton
 
-from core.config_manager import get_config_value, set_config_value
+from plugin import get_config_value, set_config_value
 
 global base
 global plugin_manager # Set by the plugin_manager, used from within the InteractiveInterpreter

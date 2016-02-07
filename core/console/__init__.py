@@ -1,4 +1,4 @@
-dependencies = ["keybindings", "config_manager"]
+dependencies = ["keybindings"]
 implements = "console"
 
 # TODO
