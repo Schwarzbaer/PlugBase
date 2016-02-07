@@ -2,13 +2,15 @@ from importlib import import_module
 import ConfigParser
 
 class PluginManager:
-    def __init__(self, config_file = None):
+    def __init__(self, config_files = None):
         self.plugins = {}
         self.active_plugins = []
-        self.startup(config_file)
+        self.startup(config_files)
     
-    def startup(self, config_file):
+    def startup(self, config_files):
         # Load all plugins
+        # Quick hack, 'cause I wanna merge something before proceeding
+        config_file = config_files[0]
         with open(config_file, "rb") as config_file:
             self.config = ConfigParser.RawConfigParser()
             self.config.readfp(config_file)

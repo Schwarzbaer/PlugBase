@@ -2,9 +2,6 @@ from code import InteractiveInterpreter
 import shlex
 import sys
 
-# FIXME: Package LUI better. 
-sys.path.insert(0, "/home/baribal/src/LUI/Builtin")
-
 from direct.showbase.DirectObject import DirectObject
 
 from panda3d.lui import LUIRegion, LUIObject, LUIInputHandler, LUISprite
