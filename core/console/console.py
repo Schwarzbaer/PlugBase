@@ -2,9 +2,6 @@ from code import InteractiveInterpreter
 import shlex
 import sys
 
-# FIXME: Package LUI better. 
-sys.path.insert(0, "/home/baribal/src/LUI/Builtin")
-
 from direct.showbase.DirectObject import DirectObject
 
 from panda3d.lui import LUIRegion, LUIObject, LUIInputHandler, LUISprite, LUIVerticalLayout
@@ -14,7 +11,7 @@ from LUIScrollableRegion import LUIScrollableRegion
 from LUIInputField import LUIInputField
 from LUIFormattedLabel import LUIFormattedLabel
 
-from core.config_manager import configargs, get_config_value#, call_on_change
+from plugin import configargs, get_config_value#, call_on_change
 
 global base # This is just to suppress Eclipse error indicators
 

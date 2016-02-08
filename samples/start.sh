@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-export PYTHONPATH=/home/baribal/workspace/PlugBase
+
+export PYTHONPATH=$PYTHONPATH:/home/baribal/src/PlugBase:/home/baribal/src/LUI/Builtin
 ./main.py
