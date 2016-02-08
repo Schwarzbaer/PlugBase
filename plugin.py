@@ -94,32 +94,34 @@ def set_config_value(section, variable, value):
     config_manager.set_value(section, variable, value)
 
 class call_on_change(DirectObject):
-    def __init__(self, section, variable, method_name):
-        self.section = section
-        self.variable = variable
-        self.method_name = method_name
+    def __init__(self, *args):
+        if len(args) == 3 and all([isinstance(arg, str) for arg in args]):
+            self.patterns = [args]
+        else: # FIXME: Check elements!
+            self.patterns = args
         self.methods_to_call = weakref.WeakSet()
-        print(self.section, self.variable, self.method_name)
+        #print(self.section, self.variable, self.method_name)
         self.accept("config_value_changed", self.change_event_filter)
     
     def __call__(self, constructor):
         def inner_func(*args, **kwargs):
             wrapped_object = constructor(*args, **kwargs)
             self.methods_to_call.add(wrapped_object)
-            print(len(self.methods_to_call), repr(wrapped_object))
+            #print(len(self.methods_to_call), repr(wrapped_object))
             return wrapped_object
         return inner_func
         
-    def change_event_filter(self, section, variable, value):
-        print("@call_on_change(%s, %s, %s, %s)" % (repr(self),
-                                                   repr(section),
-                                                   repr(variable),
-                                                   repr(value)))
-        if (section, variable) == (self.section, self.variable):
-            print("Sending on...")
-            for wrapped_object in self.methods_to_call:
-                print("Sending on to %s" % (repr(wrapped_object)))
-                getattr(wrapped_object, self.method_name)(value)
+    def change_event_filter(self, change_section, change_variable, value):
+        #print("@call_on_change(%s, %s, %s, %s)" % (repr(self),
+        #                                           repr(change_section),
+        #                                           repr(change_variable),
+        #                                           repr(value)))
+        for (section, variable, method_name) in self.patterns:
+            if (change_section, change_variable) == (section, variable):
+                #print("Sending on...")
+                for wrapped_object in self.methods_to_call:
+                    #print("Sending on to %s" % (repr(wrapped_object)))
+                    getattr(wrapped_object, method_name)(value)
             
 class configargs(object):
     """

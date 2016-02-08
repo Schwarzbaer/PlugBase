@@ -16,8 +16,8 @@ def init():
     global smiley
     smiley1 = DemoSmiley()
     smiley2 = DemoSmiley()
-    print("Smiley obj: "+str(smiley1))
-    print("Smiley obj: "+str(smiley2))
+    #print("Smiley obj: "+str(smiley1))
+    #print("Smiley obj: "+str(smiley2))
     smiley2.model.set_pos(1,0,0)
 
 def destroy():
@@ -25,12 +25,15 @@ def destroy():
     smiley.destroy()
     smiley = None
 
-@call_on_change("demo_smiley", "rotation_speed", "set_rotation_speed")
+@call_on_change(("demo_smiley", "rotation_speed", "set_rotation_speed"),
+                ("demo_smiley", "roll_speed", "set_roll_speed"))
 class DemoSmiley(DirectObject):
-    @configargs(rotation_speed = ("demo_smiley", "rotation_speed", float))
-    def __init__(self, rotation_speed = 0.2):
+    @configargs(rotation_speed = ("demo_smiley", "rotation_speed", float),
+                roll_speed = ("demo_smiley", "roll_speed", float))
+    def __init__(self, rotation_speed = 1.0, roll_speed = 1.0):
         DirectObject.__init__(self)
         self.rotation_speed = rotation_speed
+        self.roll_speed = roll_speed
 
         base.camera.set_pos(0, -5, 0)
         base.camera.look_at(0, 0, 0)
@@ -44,6 +47,7 @@ class DemoSmiley(DirectObject):
     def rotate(self, task):
         dt = globalClock.getDt()
         self.model.set_h(self.model, self.rotation_speed * 360.0 * dt)
+        self.model.set_p(self.model, self.roll_speed * 360.0 * dt)
         return Task.cont
     
     def config_value_changed(self, section, variable, value):
@@ -51,8 +55,12 @@ class DemoSmiley(DirectObject):
             self.rotation_speed = value
     
     def set_rotation_speed(self, value):
-        print("Setting rotation speed to %d" % (value, ))
+        #print("Setting rotation speed to %f" % (value, ))
         self.rotation_speed = value
+    
+    def set_roll_speed(self, value):
+        #print("Setting roll speed to %f" % (value, ))
+        self.roll_speed = value
     
     def destroy(self):
         # FIXME: Remove model
