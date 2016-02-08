@@ -42,7 +42,7 @@ TODO: existing plugins
           says it isn't? Use the "terminate with empty line" thing?
     * integrate jedi
 * config_manager
-  * Get @call_on_change to work
+  * @call_on_change should also accept lists of three element tuples.
   * Check plugin default configs for unspecified values (ConfigParser.NoOptionError)
   * Proper exceptions when not finding values
   * What about non-string type values? We've got tuples of floats already!

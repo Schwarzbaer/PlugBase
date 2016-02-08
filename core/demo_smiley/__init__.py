@@ -25,6 +25,7 @@ def destroy():
     smiley.destroy()
     smiley = None
 
+@call_on_change("demo_smiley", "rotation_speed", "set_rotation_speed")
 class DemoSmiley(DirectObject):
     @configargs(rotation_speed = ("demo_smiley", "rotation_speed", float))
     def __init__(self, rotation_speed = 0.2):
@@ -49,7 +50,6 @@ class DemoSmiley(DirectObject):
         if (section, variable) == ("demo_smiley", "rotation_speed"):
             self.rotation_speed = value
     
-    @call_on_change("demo_smiley", "rotation_speed")
     def set_rotation_speed(self, value):
         print("Setting rotation speed to %d" % (value, ))
         self.rotation_speed = value
