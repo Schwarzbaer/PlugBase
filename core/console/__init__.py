@@ -122,7 +122,9 @@ class ConsoleCommands:
                                     " "*(self.max_command_length-len(method)),
                                     brief_doc))
         elif hasattr(self, command):
-            print(getattr(self, command).__doc__)
+            full_doc = getattr(self, command).__doc__
+            main_doc = full_doc.split("\n")[2:]
+            print("\n".join(main_doc))
         else:
             print("Unknown command: %s" % (command, ) )
 
@@ -146,7 +148,7 @@ class ConsoleCommands:
         sorted based on whether they're args or kwargs, then passed
         to the class that implements %magic.
         """
-        print(self.syntax.__doc__)
+        print("\n".join(self.syntax.__doc__.split("\n")[2:]))
 
     @tokenize_magic()
     def testargs(self, *args, **kwargs):
