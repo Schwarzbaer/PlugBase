@@ -12,7 +12,14 @@ Features
   time, and which in time may evolve into an IDE.
 * Configuration management
 
-TODO: existing plugins
+TODO: Right now
+---------------
+* Document modules, especially events sent / accepted by plugins
+* Document PlugBase, especially plugin manager, config manager, decorators, helper functions
+* Remove debug prints from code
+
+
+TODO: Existing plugins
 ----------------------
 
 * console
@@ -45,6 +52,7 @@ TODO: existing plugins
 * config_manager
   * @call_on_change should closely check its args.
   * Check plugin default configs for unspecified values (ConfigParser.NoOptionError)
+  * Write changed configs back to file (and track what actually did change)
   * Proper exceptions when not finding values
   * What about non-string type values? We've got tuples of floats already!
 	* Must be asserted in the setter functions.
@@ -52,8 +60,8 @@ TODO: existing plugins
   * Well, actually implement this.
   * Optional menu
 
-TODO
-----
+TODO: New plugins
+-----------------
 
 * Capabilities checking
   * See GSG API
