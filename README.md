@@ -20,6 +20,7 @@ TODO: existing plugins
     * Harden %magic commands against wrong commands and similar erroneous
       input.
     * Improve docstrings.
+    * Add %magic to work with plugins and config vars
   * Pull appearance vars from config_manager
   * Integrate pyperclip, checking for import exception.
   * Wait for LUI to catch up, so that these can be implemented
@@ -42,7 +43,7 @@ TODO: existing plugins
           says it isn't? Use the "terminate with empty line" thing?
     * integrate jedi
 * config_manager
-  * @call_on_change should also accept lists of three element tuples.
+  * @call_on_change should closely check its args.
   * Check plugin default configs for unspecified values (ConfigParser.NoOptionError)
   * Proper exceptions when not finding values
   * What about non-string type values? We've got tuples of floats already!

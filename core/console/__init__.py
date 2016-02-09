@@ -93,8 +93,9 @@ class tokenize_magic:
         return args, kwargs
 
 class ConsoleCommands:
-    """Embedded Python console. use %help for a list of commands, and
-    %help("help")
+    """Embedded Python console. use %help for a list of commands, 
+    %help "help" for details, and %syntax for an explanation of
+    the console's %magic commands.
     """
     def __init__(self, command_prefix = "%", max_command_length = None):
         if max_command_length is None:
@@ -106,7 +107,7 @@ class ConsoleCommands:
         
     @tokenize_magic()
     def help(self, command = None):
-        """Print help text. Use '%help("command")' for more specific help.
+        """Print help text. Use '%help "command" for more specific help.
         
         There should be a longer explanation here, but I really can't think of
         anything more to say about this.
@@ -124,6 +125,28 @@ class ConsoleCommands:
             print(getattr(self, command).__doc__)
         else:
             print("Unknown command: %s" % (command, ) )
+
+    @tokenize_magic()
+    def syntax(self):
+        """Explanation of the console's syntax for %magic commands.
+        
+        An example:
+            %command "string_argument" bound_variable 42 kwarg="foo"
+
+        Commands take a space-separated list of arguments, which can
+        be either non-keyword or keyword arguments (just like in
+        Python). Strings have to be enclosed in quotation marks, as
+        bare words get interpreted as variables. Numbers get
+        interpreted as you would expect. Keywords may consist of
+        letters, digits and underdashes, but must start with a
+        letter.
+        Internally, everything after the %command name gets tokenized
+        by shlex, checked by a regex for whether it is a kwarg, and
+        then eval'd to yield the final value. Then those values are
+        sorted based on whether they're args or kwargs, then passed
+        to the class that implements %magic.
+        """
+        print(self.syntax.__doc__)
 
     @tokenize_magic()
     def testargs(self, *args, **kwargs):

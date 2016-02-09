@@ -277,7 +277,10 @@ class Console(DirectObject, BufferingInterpreter):
         self.color_stack = False
 
         lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rhoncus velit sit amet dolor auctor consequat. Donec pretium lectus sed tortor pharetra tristique. Aliquam vel pharetra ligula. Sed eget neque quis velit imperdiet molestie. Cras a sapien vitae ligula maximus tincidunt. Aenean sit amet felis velit. Fusce consectetur ante lacinia nunc varius tristique. Pellentesque sollicitudin vehicula dictum. Nulla auctor erat placerat blandit molestie. Donec quam enim, vestibulum at elit id, elementum vestibulum nulla. In nec efficitur magna. Morbi facilisis ante non nulla fermentum, quis commodo mauris elementum. Pellentesque rutrum tellus purus, quis posuere velit tincidunt in."
-        banner = "Python console. Have fun!"
+        if 'console_command' in interpreter_locals.keys():
+            banner = interpreter_locals['console_command'].__doc__
+        else:
+            banner = "Python console. Have fun!"
         self.set_write_mode("font_color_banner")
         self.write(banner)
         self.flush()
