@@ -68,6 +68,7 @@ TODO: Existing plugins
     * integrate jedi
 * config_manager
   * @call_on_change should closely check its args.
+  * Use eval() to give each config value an explicit type.
   * Check plugin default configs for unspecified values
     (ConfigParser.NoOptionError)
   * Write changed configs back to file (and track what actually did
@@ -76,6 +77,8 @@ TODO: Existing plugins
   * What about non-string type values? We've got tuples of floats
     already!
 	* Must be asserted in the setter functions.
+  * Allow for plugin-wide configs (so packaged plugins can ship with
+    their own defaults).
 * keybindings
   * Well, actually implement this.
   * Optional menu
