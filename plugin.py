@@ -99,15 +99,15 @@ class call_on_change(DirectObject):
             self.patterns = [args]
         else: # FIXME: Check elements!
             self.patterns = args
-        self.methods_to_call = weakref.WeakSet()
+        self.objects_to_call = weakref.WeakSet()
         #print(self.section, self.variable, self.method_name)
         self.accept("config_value_changed", self.change_event_filter)
     
     def __call__(self, constructor):
         def inner_func(*args, **kwargs):
             wrapped_object = constructor(*args, **kwargs)
-            self.methods_to_call.add(wrapped_object)
-            #print(len(self.methods_to_call), repr(wrapped_object))
+            self.objects_to_call.add(wrapped_object)
+            #print(len(self.objects_to_call), repr(wrapped_object))
             return wrapped_object
         return inner_func
         
@@ -119,7 +119,7 @@ class call_on_change(DirectObject):
         for (section, variable, method_name) in self.patterns:
             if (change_section, change_variable) == (section, variable):
                 #print("Sending on...")
-                for wrapped_object in self.methods_to_call:
+                for wrapped_object in self.objects_to_call:
                     #print("Sending on to %s" % (repr(wrapped_object)))
                     getattr(wrapped_object, method_name)(value)
             
