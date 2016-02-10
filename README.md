@@ -20,8 +20,7 @@ TODO
 
 Feature of the Week: ConfigManager
 ----------------------------------
-* Use eval() to give each config value an explicit type.
-* ConfigManager should be a derived class of ConfigParser
+* ConfigManager overhaul
 
 Small stuff
 -----------
@@ -38,9 +37,8 @@ Improve existing plugins
     * Improve docstring format, so that there's no more whitespaces
       an the beginning of lines.
     * Add %magic to work with plugins and config vars
-      * %cfgget ["section" ["variable"]]
-        %cfgset "section" "variable" value
-        %cfgsave
+      * %cfgsave
+        %cfgreload
       * %plload "plugin_name"
         %plunload "plugin_name"
         %plhelp "plugin_name"
@@ -66,6 +64,9 @@ Improve existing plugins
         to get a list)
       * List of registered events, and verbose output of events going
         through the systen.
+      * Lists of, and players for, media assets
+        * Integrate the .bam streamer, maybe as its own plugin.
+      * List of code snippets (to hook into tasks and events).
     * Interpreter: Input
       * If an input was incomplete, caused a syntax error or
         traceback, it should not be written to history, and the input
@@ -77,13 +78,6 @@ Improve existing plugins
       * Can I get auto-indentation?
 	* A keystroke should focus (and add itself to) the entry box.
     * destroy()
-
-
-
-
-
-
-
 * config_manager
   * @call_on_change should closely check its args.
   * Use eval() to give each config value an explicit type.
@@ -96,6 +90,10 @@ Improve existing plugins
   * What about non-string type values? We've got tuples of floats
     already!
 	* Must be asserted in the setter functions.
+  * There should be a hierarchy of config file objects (i.e. plugin,
+    framework, game, editor), and changes should be written into the
+    appropriate file, usually the topmost one, unless explicitly
+    specified otherwise.
   * Allow for plugin-wide configs (so packaged plugins can ship with
     their own defaults).
 * keybindings

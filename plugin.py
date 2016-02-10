@@ -16,7 +16,7 @@ class PluginManager:
     
     def startup(self):
         # Load all plugins
-        init_on_startup = config_manager.get_value("plugins", "init_on_startup").split(",")
+        init_on_startup = config_manager.get("plugins", "init_on_startup")
         for plugin_name in init_on_startup:
             self.load_plugin(plugin_name)
         left_to_init = self.plugins.keys()
@@ -41,7 +41,7 @@ class PluginManager:
             print("Couldn't load: %s" % (", ".join(left_to_init) ,))
     
     def load_plugin(self, plugin_name):
-        directory = config_manager.get_value("plugin_dirs", plugin_name)
+        directory = config_manager.get("plugin_dirs", plugin_name)
         plugin = import_module(directory)
         plugin.plugin_manager = self
         self.plugins[plugin_name] = plugin
@@ -66,6 +66,7 @@ class PluginManager:
 
 class ConfigManager(DirectObject):
     def __init__(self, config_files):
+        DirectObject.__init__(self)
         self.config = SafeConfigParser()
         read_files = self.config.read(config_files)
         unread_files = []
@@ -74,21 +75,32 @@ class ConfigManager(DirectObject):
                 unread_files.append(f)
         if len(unread_files) > 0:
             print("Couldn't read config files %s." % (", ".join(unread_files), ))
-        self.accept("change_config_value", self.set_value)
+        self.accept("change_config_value", self.set)
+        self.accept("config_save", self.save)
 
-    def get_value(self, section, variable):
-        value = self.config.get(section, variable)
+    def sections(self):
+        return self.config.sections()
+
+    def items(self, section):
+        return self.config.items(section)
+
+    def get(self, section, variable):
+        value = eval(self.config.get(section, variable))
         return value
 
-    def set_value(self, section, variable, value):
-        self.config.set(section, variable, str(value))
+    def set(self, section, variable, value):
+        self.config.set( section, variable, str(value))
         base.messenger.send("config_value_changed", [section, variable, value])
+
+    def save(self):
+        # FIXME: Implement
+        pass
 
     def destroy(self):
         self.config.close()
 
 def get_config_value(section, variable, value_type = str):
-    return value_type(config_manager.get_value(section, variable))
+    return value_type(config_manager.get(section, variable))
 
 def set_config_value(section, variable, value):
     config_manager.set_value(section, variable, value)
@@ -142,8 +154,8 @@ class configargs(object):
                 if key not in kwargs.keys():
                     variable_description = self.default_kwargs[key]
                     if len(variable_description) == 2:
-                        kwargs[key] = config_manager.get_value(*variable_description)
+                        kwargs[key] = config_manager.get(*variable_description)
                     else:
-                        kwargs[key] = variable_description[2](config_manager.get_value(variable_description[0], variable_description[1]))
+                        kwargs[key] = variable_description[2](config_manager.get(variable_description[0], variable_description[1]))
             return wrapped_func(*args, **kwargs)
         return inner_func

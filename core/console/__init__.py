@@ -9,10 +9,13 @@ from console import Console
 global base
 global console # Do I even want this?
 global plugin_manager # Set by the plugin_manager, used from within the InteractiveInterpreter
+global config_manager # Set by the plugin_manager, used from within the InteractiveInterpreter
 
 def init():
+    from plugin import config_manager as cfg_mgr
+    global config_manager
+    config_manager = cfg_mgr
     global console
-    from plugin import config_manager
     console = Console(interpreter_locals = dict(pm = plugin_manager,
                                                 cm = config_manager,
                                                 console_command = ConsoleCommands()))
@@ -162,3 +165,30 @@ class ConsoleCommands:
             else:
                 print(plugin + " (loaded)")
 
+    @tokenize_magic()
+    def cfglist(self, *args):
+        """Show configuration data.
+        
+        Usage: %cfglist ["section" ["variable"]]
+        
+        If no section is provided, this command will print a list of
+        sections. If a section is provided, it will show the
+        variables in that section. If both a section and a variable
+        are provided, it will show just that variable.
+        """
+        if len(args) == 0:
+            for section in config_manager.sections():
+                print(section)
+        elif len(args) == 1:
+            for item, value in config_manager.items(args[0]):
+                print(str(item) + " = " + str(value))
+        elif len(args) == 2:
+            print(config_manager.get(args[0], args[1]))
+
+    @tokenize_magic()
+    def cfgset(self, section, variable, value):
+        """Set a configuration variable.
+        
+        Usage: %cfgset section variable value
+        """
+        config_manager.set(section, variable, value)
