@@ -14,17 +14,24 @@ How to PlugBase
 ---------------
 
 
+TODO
+====
 
-TODO: Right now
----------------
+Feature of the Week: ConfigManager
+----------------------------------
+* Use eval() to give each config value an explicit type.
+* ConfigManager should be a derived class of ConfigParser
+
+Small stuff
+-----------
 * Document modules, especially events sent / accepted by plugins
 * Document PlugBase, especially plugin manager, config manager,
   decorators, helper functions
 * Remove debug prints from code
 
-TODO: Existing plugins
-----------------------
 
+Improve existing plugins
+------------------------
 * console
   * Interpreter %magic
     * Improve docstrings.
@@ -69,6 +76,7 @@ TODO: Existing plugins
 * config_manager
   * @call_on_change should closely check its args.
   * Use eval() to give each config value an explicit type.
+  * ConfigManager should be a derived class of ConfigParser
   * Check plugin default configs for unspecified values
     (ConfigParser.NoOptionError)
   * Write changed configs back to file (and track what actually did
@@ -86,9 +94,8 @@ TODO: Existing plugins
   * render.explore()
   * light.showFrustum()
 
-TODO: New plugins
------------------
-
+New plugins
+-----------
 * Capabilities checking
   * See GSG API
 * Input bindings, mappings and contexts
