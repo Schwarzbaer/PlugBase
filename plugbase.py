@@ -1,20 +1,5 @@
 #!/usr/bin/env python
 
-# TODO
-# Move Plugin_Manager in here?
-# Add "can_use" as plugin variable, which means that if possible, this plugin should be init()ed after the named ones, and that it should be informed of them having been started, so that it can expose special behaviour; i.e. the console supporting catching config variable events.
-# * The example is pointless, as plugins can accept events even when they will never be emitted.  
-# Write config_manager plugin
-# * Have PluginManager .close() config before loading any plugin
-#   * Apparently pm should also use readfp() instead?
-# * Have config_manager read/write configs, emit value changes as events,
-#   and .close() on destroy()
-# Write @expose_hook to allow for easy hooking into a plugin's
-#   functionality.
-# Write @configargs to add default values for kwargs where not
-#   overridden by them being explicitly stated.
-# Document how to write a plugin.
-
 import os
 
 from direct.showbase.ShowBase import ShowBase

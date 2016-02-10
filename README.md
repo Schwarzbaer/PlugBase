@@ -6,9 +6,10 @@ consists only of writing the game, and the game is easy to make
 completely moddable.
 
 PlugBase features:
+* Plugin loading and automatically ordered initialization
+* Centralized configuration management
 * A Python console to inspect and manipulate the game's state in real
   time, and which in time may evolve into an IDE.
-* Centralized configuration management
 
 How to PlugBase
 ---------------
@@ -28,7 +29,6 @@ Small stuff
 * Document PlugBase, especially plugin manager, config manager,
   decorators, helper functions
 * Remove debug prints from code
-
 
 Improve existing plugins
 ------------------------
@@ -54,6 +54,7 @@ Improve existing plugins
     * history
       * Track the bottom
       * Should be scrollable by mousewheel
+      * Copy to input field / cursor-up for past command
     * "Save selected fields to file"
       * File selection dialogue
       * Flushing items to file
@@ -73,6 +74,16 @@ Improve existing plugins
           but the user says it isn't? Use the "terminate with empty
           line" thing?
     * integrate jedi
+      * Can I get auto-indentation?
+	* A keystroke should focus (and add itself to) the entry box.
+    * destroy()
+
+
+
+
+
+
+
 * config_manager
   * @call_on_change should closely check its args.
   * Use eval() to give each config value an explicit type.
@@ -96,6 +107,10 @@ Improve existing plugins
 
 New plugins
 -----------
+* Core functionality
+  * @expose_hooks
+  * Move plugin.* to plugbase?
+  * can_use plugin var for deferred init()?
 * Capabilities checking
   * See GSG API
 * Input bindings, mappings and contexts

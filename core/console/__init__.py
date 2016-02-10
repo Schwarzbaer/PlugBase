@@ -1,31 +1,6 @@
 dependencies = ["keybindings"]
 implements = "console"
 
-# TODO
-# When enough text is entered so that the scroll bar appears, it
-#   should be on bottom position, and track it when text is
-#   entered.
-# A keystroke should focus (and add the keystroke to) the entry
-#   box.
-# Finish destroy()
-# Improve the Interpreter
-# Add more relevant locals / globals to the interpreter
-# Add shorthands to the interpreter input, akin to %paste
-# References to base should be replaced by window-specific
-#   references, as not using ShowBase will probably make base vanish,
-#   too.
-# IDEificatioin
-#   History
-#   Input should not be limited to a single line
-#   Tab completion should exist
-#     https://github.com/davidhalter/jedi
-#   There should be help with indentation (also jedi)
-#   Saving code snippets
-# Many resize() operations (i.e. text placements) should only be done
-#   if the Y size of the window actually has changed
-# Add support for frames on the canvas, because nothing says "simple"
-#   like a console full of widgets...
-
 import re
 import shlex
 
