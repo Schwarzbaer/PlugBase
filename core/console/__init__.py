@@ -168,3 +168,22 @@ class ConsoleCommands:
         Example: %sendev("debug_fps", True)"""
         base.messenger.send(event_name, list(args))
         print("Sent event %s with arguments %s" % (event_name, ", ".join([repr(arg) for arg in args])))
+
+    # PluginManager-related
+
+    @tokenize_magic()
+    def pllist(self):
+        """Show list of loaded / active plugins.
+        
+        Shows which plugins are loaded, and which ones are loaded and
+        active.
+        """
+        
+        loaded = plugin_manager.get_loaded_plugins()
+        active = plugin_manager.get_active_plugins()
+        for plugin in loaded:
+            if plugin in active:
+                print(plugin + " (active)")
+            else:
+                print(plugin + " (loaded)")
+
