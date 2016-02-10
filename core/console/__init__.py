@@ -192,3 +192,13 @@ class ConsoleCommands:
         Usage: %cfgset section variable value
         """
         config_manager.set(section, variable, value)
+    
+    @tokenize_magic()
+    def cfgwrite(self):
+        """Write changes back to config file.
+        
+        Write changed configuration values into the file that has
+        been determined to be the appropriate one by virtue of
+        being the last one in the list of config files that actually
+        exists."""
+        config_manager.write()

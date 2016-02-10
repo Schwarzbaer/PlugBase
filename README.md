@@ -37,8 +37,8 @@ Improve existing plugins
     * Improve docstring format, so that there's no more whitespaces
       an the beginning of lines.
     * Add %magic to work with plugins and config vars
-      * %cfgsave
-        %cfgreload
+      * %cfgreload
+        %cfgdiff
       * %plload "plugin_name"
         %plunload "plugin_name"
         %plhelp "plugin_name"
@@ -130,3 +130,8 @@ New plugins
 * Logging console
   * Use for regular logging and for debugging / profiling information
   * (Only) Ship logs to server if explicitly requested to do so
+* Collaboration tools
+  * Sharing assets
+  * Drawing board, text storage
+  * VoIP
+  * Twitch integration

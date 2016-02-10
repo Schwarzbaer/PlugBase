@@ -16,7 +16,7 @@ class PluginManager:
     
     def startup(self):
         # Load all plugins
-        init_on_startup = config_manager.get("plugins", "init_on_startup")
+        init_on_startup = config_manager.get("plugins", "init_on_startup").split(",")
         for plugin_name in init_on_startup:
             self.load_plugin(plugin_name)
         left_to_init = self.plugins.keys()
@@ -75,8 +75,16 @@ class ConfigManager(DirectObject):
                 unread_files.append(f)
         if len(unread_files) > 0:
             print("Couldn't read config files %s." % (", ".join(unread_files), ))
+        for config_file in reversed(config_files):
+            if config_file in read_files:
+                self.writeback_file = config_file
+                print("Will write config to %s" % (config_file, ))
+                break
+        else:
+            print("No config file to write back to found!")
+            self.writeback_file = None
         self.accept("change_config_value", self.set)
-        self.accept("config_save", self.save)
+        self.accept("config_write", self.write)
 
     def sections(self):
         return self.config.sections()
@@ -89,12 +97,16 @@ class ConfigManager(DirectObject):
         return value
 
     def set(self, section, variable, value):
-        self.config.set( section, variable, str(value))
+        self.config.set( section, variable, repr(value))
         base.messenger.send("config_value_changed", [section, variable, value])
 
-    def save(self):
-        # FIXME: Implement
-        pass
+    def write(self):
+        if self.writeback_file is not None:
+            with open(self.writeback_file, "wb") as f:
+                self.config.write(f)
+        else:
+            #FIXME: Exception, your honor!
+            print("Still no config to write to known!")
 
     def destroy(self):
         self.config.close()
