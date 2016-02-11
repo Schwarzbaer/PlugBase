@@ -18,9 +18,9 @@ How to PlugBase
 TODO
 ====
 
-Feature of the Week: ConfigManager
+Feature of the Week: PluginManager
 ----------------------------------
-* ConfigManager overhaul
+* PluginManager overhaul
 
 Small stuff
 -----------
@@ -37,8 +37,6 @@ Improve existing plugins
     * Improve docstring format, so that there's no more whitespaces
       an the beginning of lines.
     * Add %magic to work with plugins and config vars
-      * %cfgreload
-        %cfgdiff
       * %plload "plugin_name"
         %plunload "plugin_name"
         %plhelp "plugin_name"
@@ -84,18 +82,7 @@ Improve existing plugins
   * ConfigManager should be a derived class of ConfigParser
   * Check plugin default configs for unspecified values
     (ConfigParser.NoOptionError)
-  * Write changed configs back to file (and track what actually did
-    change)
   * Proper exceptions when not finding values
-  * What about non-string type values? We've got tuples of floats
-    already!
-	* Must be asserted in the setter functions.
-  * There should be a hierarchy of config file objects (i.e. plugin,
-    framework, game, editor), and changes should be written into the
-    appropriate file, usually the topmost one, unless explicitly
-    specified otherwise.
-  * Allow for plugin-wide configs (so packaged plugins can ship with
-    their own defaults).
 * keybindings
   * Well, actually implement this.
   * Optional menu
@@ -135,3 +122,15 @@ New plugins
   * Drawing board, text storage
   * VoIP
   * Twitch integration
+
+Far future
+----------
+* ConfigManager
+  * Allow for plugin-wide configs (so packaged plugins can ship with
+    their own defaults).
+  * There should be a hierarchy of config file objects (i.e. plugin,
+    framework, game, editor), and changes should be written into the
+    appropriate file, usually the topmost one, unless explicitly
+    specified otherwise.
+  * %cfgreload, %cfgdiff
+  
