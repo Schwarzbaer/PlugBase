@@ -119,6 +119,10 @@ New plugins
         the player is close enough, he can press E to open the door.
 * Logging console
   * Use for regular logging and for debugging / profiling information
+  * Listen to "log" events
+  * Write to graphical window, stdout/stderr and/or file
+  * Filter (in GUI) by search term, glob and/or regex
+  * logrotate and/or purge old logs
   * (Only) Ship logs to server if explicitly requested to do so
 * Collaboration tools
   * Sharing assets
