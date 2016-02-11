@@ -31,6 +31,9 @@ Small stuff
 
 Improve existing plugins
 ------------------------
+* PluginManager
+  * Have logic dealing with missing plugins, inability to import,
+    inability to init.
 * console
   * Interpreter %magic
     * Improve docstrings.
