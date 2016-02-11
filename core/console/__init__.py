@@ -202,3 +202,25 @@ class ConsoleCommands:
         being the last one in the list of config files that actually
         exists."""
         config_manager.write()
+
+    @tokenize_magic()
+    def plload(self, plugin_name):
+        """Load and initialize a plugin.
+        
+        Usage: %plload plugin_name"""
+        # FIXME: There should be logic here, in case that the plugin
+        # can't be found or inited.
+        # FIXME: Also, how about a just-load option?
+        plugin_manager.load_plugin(plugin_name)
+        plugin_manager.init_plugin(plugin_name)
+
+    @tokenize_magic()
+    def plinit(self, plugin_name):
+        """Initialize a loaded but inactive plugin.
+        
+        Usage: %plinit plugin_name"""
+        # FIXME: There should be logic here, in case that the plugin
+        # can't be inited. Maybe there should also be a check whether
+        # it is even loaded in the first place, or already active?
+        plugin_manager.load_plugin(plugin_name)
+        plugin_manager.init_plugin(plugin_name)
