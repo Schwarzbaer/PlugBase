@@ -108,20 +108,20 @@ class ConsoleGUI:
         
         self.history_region = LUIScrollableRegion()
         self.history_region.width = "100%"
-        self.history_region.height = 400
+        self.history_region.height = "100%"
         self.history_region.margin = 0
-        console.add(self.history_region)
+        console.add(self.history_region, "*")
 
         self.history = LUIVerticalLayout(parent = self.history_region.content_node,
                                          spacing = 2)
         self.history.width = "100%"
-        self.history.height = "100%"
+        #self.history.height = "100%"
         self.history.margin = 0
 
         self.command_line = LUIInputField()
         self.command_line.width = "100%"
         #self.command_line.height = "10%"
-        console.add(self.command_line)
+        console.add(self.command_line, "?")
         
         self.command_line.bind("tab", self.tab)
         self.command_line.bind("enter", self.enter)
@@ -144,7 +144,7 @@ class ConsoleGUI:
         self.history_objects.append(ConsoleHistoryItem(self.history,
                                                        text,
                                                        color = color))
-        #self.history_region.scroll_to_bottom()
+        self.history_region.scroll_to_bottom()
 
     def enter(self, event):
         print("text was entered. " + str(event))
@@ -192,11 +192,11 @@ class ConsoleGUI:
 
 class ConsoleHistoryItem:
     def __init__(self, history, text, color = "font_color_entry"):
-        self.history_entry = LUIFormattedLabel(margin = (0, 0, 0, 0),
-                                               #padding = 10,
-                                               #color=(0.4,0.0,0.0, 1.0),
-                                               )
-        history.add(self.history_entry)
+        self.history_entry = LUIFormattedLabel()
+        self.history_entry.margin = (0, 0, 0, 0)
+        #self.history_entry.height = "100%"
+        #self.history_entry.width = "100%"
+        history.add(self.history_entry, "?")
         self.history_entry.solid = True
         self.history_entry.bind("click", self.click)
 
