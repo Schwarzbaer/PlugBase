@@ -11,9 +11,9 @@ PlugBase features:
 * A Python console to inspect and manipulate the game's state in real
   time, and which in time may evolve into an IDE.
 
-PlugBase depends on LUI (http://www.panda3d.org/) and LUI
+PlugBase depends on Panda3D (http://www.panda3d.org/) and LUI
 (https://github.com/tobspr/LUI). It uses git-flow to manage the code
-repository.
+repository (http://danielkummer.github.io/git-flow-cheatsheet/).
 
 How to PlugBase
 ---------------
