@@ -78,7 +78,7 @@ class FakeIO:
 #     |     + FormattedLabel
 #     |     + FormattedLabel
 #     |     + ...
-#     + InputField
+#     + InputField               # command_line
 
 class ConsoleGUI:
     def __init__(self, interpreter):
@@ -96,24 +96,33 @@ class ConsoleGUI:
         self.console_frame = LUIFrame(parent = region.root)
         self.console_frame.pos = (0, 0)
         self.console_frame.width = "100%"
-        self.console_frame.height = "33%"
+        self.console_frame.height = "100%"
         self.console_frame.margin = (10, 12, 10, 12)
         self.console_frame.style = LUIFrame.FS_raised # LUIFrame.FS_sunken
 
         console = LUIVerticalLayout(parent = self.console_frame, spacing = 3)
         #console.use_dividers = True
-        console.margin = (0, 0, 0, 0)
-        console.width = self.console_frame.width
+        console.width = "100%"
+        console.height = "100%"
+        console.margin = 0
         
-        self.history_region = LUIScrollableRegion(margin = 0, width = console.width - 10)
+        self.history_region = LUIScrollableRegion()
+        self.history_region.width = "100%"
+        self.history_region.height = 400
+        self.history_region.margin = 0
         console.add(self.history_region)
+
         self.history = LUIVerticalLayout(parent = self.history_region.content_node,
                                          spacing = 2)
-        self.history.margin = (0, 0, 0, 0)
-        self.history.width = self.history_region.width
+        self.history.width = "100%"
+        self.history.height = "100%"
+        self.history.margin = 0
 
-        self.command_line = LUIInputField(width = console.width - 10)
+        self.command_line = LUIInputField()
+        self.command_line.width = "100%"
+        #self.command_line.height = "10%"
         console.add(self.command_line)
+        
         self.command_line.bind("tab", self.tab)
         self.command_line.bind("enter", self.enter)
         self.command_line.bind("control-c", self.copy)
@@ -337,3 +346,7 @@ class Console(DirectObject, BufferingInterpreter):
             #self.update_gui()
             self.visible = True
         self.gui_window.set_visible(self.visible)
+    
+    def destroy(self):
+        # FIXME: delete all the nodes / nodepaths and forget about all events
+        pass
