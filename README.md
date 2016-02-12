@@ -20,7 +20,15 @@ TODO
 
 Feature of the Week: PluginManager
 ----------------------------------
-* PluginManager overhaul
+* Implement .destroy() in console
+* %plreload
+* "extends" keyword for plugins. If a set of plugins is loaded,
+  then those that extend others on the list should, if possible, be
+  inited after them. init() should have a list of extended plugins
+  that were loaded before as an argument.
+* Make console_magic a module-global object, so that plugins that
+  "extend" it can add their magic.
+
 
 Small stuff
 -----------

@@ -9,7 +9,7 @@ from console import Console
 global base
 global console # Do I even want this?
 global plugin_manager # Set by the plugin_manager, used from within the InteractiveInterpreter
-global config_manager # Set by the plugin_manager, used from within the InteractiveInterpreter
+global config_manager # Set via late import
 
 def init():
     from plugin import config_manager as cfg_mgr
@@ -23,7 +23,7 @@ def init():
 def destroy():
     global console
     console.destroy()
-    console = None
+    console = None # FIXME: It's a DirectObject, though
 
 # FIXME: Add arg for further explanation based on isinstance(exception, ...)
 class ArgumentNotEvaluable(Exception):
@@ -213,6 +213,15 @@ class ConsoleCommands:
         # FIXME: Also, how about a just-load option?
         plugin_manager.load_plugin(plugin_name)
         plugin_manager.init_plugin(plugin_name)
+
+    @tokenize_magic()
+    def plreload(self, plugin_name):
+        """Unload, load and initialize a plugin.
+        
+        Usage: %plreload plugin_name"""
+        plugin_manager.reload_plugin(plugin_name)
+        plugin_manager.init_plugin(plugin_name)
+
 
     @tokenize_magic()
     def plinit(self, plugin_name):

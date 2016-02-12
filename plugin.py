@@ -46,6 +46,14 @@ class PluginManager:
         plugin.plugin_manager = self
         self.plugins[plugin_name] = plugin
     
+    def unload_plugin(self, plugin_name):
+        self.plugins[plugin_name].destroy()
+        del self.plugins[plugin_name]
+    
+    def reload_plugin(self, plugin_name):
+        self.unload_plugin(plugin_name)
+        self.load_plugin(plugin_name)
+    
     def init_plugin(self, plugin_name):
         # FIXME: assert that plugin is loaded.
         #   Have a switch to auto-load it if it isn't.

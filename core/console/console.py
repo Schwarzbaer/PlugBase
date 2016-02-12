@@ -93,14 +93,13 @@ class ConsoleGUI:
         base.mouseWatcher.attach_new_node(handler)
         region.set_input_handler(handler)
 
-        self.console_frame = LUIFrame(parent = region.root,
-                                      pos = (0, 0),
-                                      width = base.win.get_x_size() - 10,
-                                      height = base.win.get_y_size() * 0.75,
-                                      style = LUIFrame.FS_raised,
-                                      #style = LUIFrame.FS_sunken,
-                                      margin = (5, 5, 5, 5),
-                                      )
+        self.console_frame = LUIFrame(parent = region.root)
+        self.console_frame.pos = (0, 0)
+        self.console_frame.width = "100%"
+        self.console_frame.height = "33%"
+        self.console_frame.margin = (10, 12, 10, 12)
+        self.console_frame.style = LUIFrame.FS_raised # LUIFrame.FS_sunken
+
         console = LUIVerticalLayout(parent = self.console_frame, spacing = 3)
         #console.use_dividers = True
         console.margin = (0, 0, 0, 0)
@@ -285,6 +284,11 @@ class Console(DirectObject, BufferingInterpreter):
         self.write(banner)
         self.flush()
 
+    def destroy(self):
+        self.gui_window.destroy()
+        self.fake_io = None
+        self.history = None
+
     # Python Interpreter-relevant methods
 
     def command(self, input_text):
@@ -333,7 +337,3 @@ class Console(DirectObject, BufferingInterpreter):
             #self.update_gui()
             self.visible = True
         self.gui_window.set_visible(self.visible)
-    
-    def destroy(self):
-        # FIXME: delete all the nodes / nodepaths and forget about all events
-        pass
