@@ -14,11 +14,7 @@ global smiley
 
 def init():
     global smiley
-    smiley1 = DemoSmiley()
-    smiley2 = DemoSmiley()
-    #print("Smiley obj: "+str(smiley1))
-    #print("Smiley obj: "+str(smiley2))
-    smiley2.model.set_pos(1,0,0)
+    smiley = DemoSmiley()
 
 def destroy():
     global smiley
@@ -42,7 +38,7 @@ class DemoSmiley(DirectObject):
         self.model.reparent_to(base.render)
         
         #self.accept("config_value_changed", self.config_value_changed)
-        base.taskMgr.add(self.rotate, "rotate_smiley")
+        self.task = base.taskMgr.add(self.rotate, "rotate_smiley")
     
     def rotate(self, task):
         dt = globalClock.getDt()
@@ -63,5 +59,5 @@ class DemoSmiley(DirectObject):
         self.roll_speed = value
     
     def destroy(self):
-        # FIXME: Remove model
-        pass
+        base.taskMgr.remove(self.task)
+        self.model.remove_node()
