@@ -70,6 +70,9 @@ class PluginManager:
     
     def get_active_plugins(self):
         return self.active_plugins
+    
+    def get_interface(self, plugin_name):
+        return self.plugins[plugin_name].interface
 
 
 class ConfigManager(DirectObject):

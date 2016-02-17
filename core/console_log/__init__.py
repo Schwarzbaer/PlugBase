@@ -1,0 +1,92 @@
+from direct.showbase.DirectObject import DirectObject
+import datetime
+
+from panda3d.lui import LUIObject, LUIVerticalLayout, LUIHorizontalLayout
+from LUIScrollableRegion import LUIScrollableRegion
+from LUIButton import LUIButton
+from LUIInputField import LUIInputField
+from LUIFormattedLabel import LUIFormattedLabel
+
+dependencies = ["console"]
+implements = "log_console"
+
+global base
+global plugin_manager
+global interface
+
+def init():
+    global intercafe
+    interface = LogConsole()
+    plugin_manager.get_interface("console").add_console(LUIButton(text = "Log"), interface.get_gui())
+    
+def destroy():
+    global intercafe
+    interface.destroy()
+    interface = None
+
+DEBUG = 0
+INFO = 1
+WARNING = 2
+ERROR = 3
+loglevel_to_string = ["DEBUG", "INFO", "WARNING", "ERROR"]
+log_color = {0: (0.5, 0.5, 0.5),
+             1: (1.0, 1.0, 1.0),
+             2: (1.0, 1.0, 0.0),
+             3: (1.0, 0.0, 0.0)}
+
+class LogConsole(DirectObject):
+    def __init__(self):
+        DirectObject.__init__(self)
+        self.log_entries = []
+        #super(LogConsole, self).__init__()
+        self.loglevel = 0
+        self.num_loglevels = 4
+        self.setup_gui()
+        self.accept("log-event", self._log)
+        for i in range(10):
+            self._log(0, "foo\nbar\nbaz")
+            self._log(1, "foo bar\nbaz")
+            self._log(2, "foo bar baz")
+            self._log(3, "foo bar baz")
+    
+    def setup_gui(self):
+        self.gui_root = LUIObject()
+        self.gui_root.width = "100%"
+        self.gui_root.height = "100%"
+
+        self.gui_layout = LUIVerticalLayout(parent = self.gui_root,
+                                            spacing = 2)
+        self.gui_layout.width = "100%"
+        self.gui_layout.height = "100%"
+        
+        self.log_history_region = LUIScrollableRegion()
+        self.log_history_region.width = "100%"
+        self.log_history_region.height = "100%"
+        self.gui_layout.add(self.log_history_region, "*")
+        self.log_history = LUIVerticalLayout(parent = self.log_history_region.content_node,
+                                         spacing = 2)
+        
+        self.filter_bar = LUIHorizontalLayout(parent = self.gui_layout.cell("?"))
+        self.filter_bar.width = "100%"
+        self.filter_loglevel = LUIButton(parent = self.filter_bar.cell("20%"), text = loglevel_to_string[self.loglevel])
+        self.filter_loglevel.width = "100%"
+        self.filter_loglevel.bind("click", self._toggle_loglevel)
+        self.filter_string = LUIInputField(parent = self.filter_bar.cell("80%"))
+        self.filter_string.width = "100%"
+
+    def get_gui(self):
+        return self.gui_root
+    
+    def _log(self, loglevel, message):
+        now = datetime.datetime.now()
+        history_entry = LUIFormattedLabel()
+        for line in message.split("\n"):
+            history_entry.add(line, font_size = 15, color = log_color[loglevel])
+            history_entry.newline()
+        self.log_history.add(history_entry)
+        self.log_entries.append((now, loglevel, message, history_entry))
+        self.log_history_region.scroll_to_bottom()
+
+    def _toggle_loglevel(self, lui_event):
+        self.loglevel = (self.loglevel + 1) % self.num_loglevels
+        self.filter_loglevel.text = loglevel_to_string[self.loglevel]
