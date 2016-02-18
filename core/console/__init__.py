@@ -1,36 +1,59 @@
-"""A Python console for more interactive game development than
-Panda3D offers by itself.
-
-Interface:
-* console: The actual interpreter and GUI
-  * Actually, nothing of this is meant for public consumption ATM.
-* consolew_magic: A set of self-documenting extensions of the
-    console's functionality, in the form of %magic commands.
-  * add_magic (not implemented):
-  * remove_magic (also not implemented):
-"""
-
 dependencies = ["keybindings"]
 implements = "console"
 
-from console import Console, ConsoleCommands
+from direct.showbase.DirectObject import DirectObject
+from panda3d.lui import LUIRegion, LUIInputHandler
+
+from LUISkin import LUIDefaultSkin
+from LUITabbedFrame import LUITabbedFrame
 
 global base
-global console # Do I even want this?
 global plugin_manager # Set by the plugin_manager, used from within the InteractiveInterpreter
+global interface
 
 def init():
-    from plugin import config_manager as cfg_mgr
-    global config_manager
-    config_manager = cfg_mgr
-    global console_magic
-    console_magic = ConsoleCommands(plugin_manager, config_manager)
-    global console
-    console = Console(interpreter_locals = dict(pm = plugin_manager,
-                                                cm = config_manager,
-                                                console_command = console_magic))
+    global interface
+    interface = ConsoleFrame()
 
 def destroy():
-    global console
-    console.destroy()
-    console = None # FIXME: It's a DirectObject, though
+    global interface
+    interface.destroy()
+    interface = None
+
+class ConsoleFrame(DirectObject):
+    def __init__(self):
+        DirectObject.__init__(self)
+        skin = LUIDefaultSkin()
+        skin.load()
+    
+        region = LUIRegion.make("LUI", base.win)
+        handler = LUIInputHandler()
+        base.mouseWatcher.attach_new_node(handler)
+        region.set_input_handler(handler)
+    
+        tabbed_frame = LUITabbedFrame(parent = region.root)
+        tabbed_frame.pos = (0, 0)
+        tabbed_frame.width = "100%"
+        tabbed_frame.height = "100%"
+        tabbed_frame.margin = 20
+        tabbed_frame.style = LUITabbedFrame.FS_raised
+        self.frame = tabbed_frame
+
+        self.visible = False
+        self.frame.hide()
+        self.accept("toggle_console", self._toggle_visibility)
+
+    def destroy(self):
+        self.frame = None
+
+    def _toggle_visibility(self):
+        if self.visible:
+            # Hide Console
+            self.visible = False
+        else:
+            # Show console
+            self.visible = True
+        self.frame.set_visible(self.visible)
+
+    def add_console(self, button, window):
+        self.frame.add(button, window)

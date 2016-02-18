@@ -6,8 +6,6 @@ import re
 from direct.showbase.DirectObject import DirectObject
 
 from panda3d.lui import LUIRegion, LUIObject, LUIInputHandler, LUISprite, LUIVerticalLayout
-from LUISkin import LUIDefaultSkin
-from LUIFrame import LUIFrame
 from LUIScrollableRegion import LUIScrollableRegion
 from LUIInputField import LUIInputField
 from LUIFormattedLabel import LUIFormattedLabel
@@ -86,21 +84,7 @@ class ConsoleGUI:
         self.interpreter = interpreter
         self.history_objects = []
         
-        skin = LUIDefaultSkin()
-        skin.load()
-
-        region = LUIRegion.make("LUI", base.win)
-        handler = LUIInputHandler()
-        base.mouseWatcher.attach_new_node(handler)
-        region.set_input_handler(handler)
-
-        self.console_frame = LUIFrame(parent = region.root)
-        self.console_frame.pos = (0, 0)
-        self.console_frame.width = "100%"
-        self.console_frame.height = "100%"
-        self.console_frame.margin = (10, 12, 10, 12)
-        self.console_frame.style = LUIFrame.FS_raised # LUIFrame.FS_sunken
-
+        self.console_frame = LUIObject()
         console = LUIVerticalLayout(parent = self.console_frame, spacing = 3)
         #console.use_dividers = True
         console.width = "100%"
@@ -277,7 +261,6 @@ class Console(DirectObject, BufferingInterpreter):
         self.window = base.win
         self.visible = False
         self.gui_window.set_visible(self.visible)
-        self.accept("toggle_console", self.toggle_visibility)
 
         self.fake_io = FakeIO()
         self.color_stack = False
@@ -331,17 +314,6 @@ class Console(DirectObject, BufferingInterpreter):
                 print(repr(e))
         else:
             return True
-
-    # Things related to the plugin's general functionality.
-
-    def toggle_visibility(self):
-        if self.visible:
-            # Hide Console
-            self.visible = False
-        else:
-            # Show console
-            self.visible = True
-        self.gui_window.set_visible(self.visible)
 
 # Console magic
 
