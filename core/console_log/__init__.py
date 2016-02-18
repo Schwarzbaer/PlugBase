@@ -43,11 +43,6 @@ class LogConsole(DirectObject):
         self.num_loglevels = 4
         self.setup_gui()
         self.accept("log-event", self._log)
-        for i in range(10):
-            self._log(0, "foo\nbar\nbaz")
-            self._log(1, "foo bar\nbaz")
-            self._log(2, "foo bar baz")
-            self._log(3, "foo bar baz")
     
     def setup_gui(self):
         self.gui_root = LUIObject()
@@ -70,16 +65,20 @@ class LogConsole(DirectObject):
         self.log_history = LUIVerticalLayout(parent = self.log_history_region.content_node,
                                          spacing = 2)
         self.log_history.width = "100%"
-        self.log_history.height = "100%"
+        #self.log_history.height = "100%"
         self.log_history.set_debug_name("DEBUG log_history")
         
         self.filter_bar = LUIHorizontalLayout(parent = self.gui_layout.cell("?"))
         self.filter_bar.width = "100%"
-        self.filter_loglevel = LUIButton(parent = self.filter_bar.cell("20%"), text = loglevel_to_string[self.loglevel])
+        self.filter_loglevel = LUIButton(parent = self.filter_bar.cell("20%"),
+                                         text = loglevel_to_string[self.loglevel],
+                                         color = log_color[self.loglevel])
         self.filter_loglevel.width = "100%"
         self.filter_loglevel.bind("click", self._toggle_loglevel)
         self.filter_string = LUIInputField(parent = self.filter_bar.cell("80%"))
         self.filter_string.width = "100%"
+        self.filter_string.top = 1
+        self.filter_string.left = 5
 
     def get_gui(self):
         return self.gui_root
@@ -90,18 +89,16 @@ class LogConsole(DirectObject):
         history_entry = LUIObject()
         history_entry.set_debug_name("DEBUG history_entry")
         history_entry.width = "100%"
-        history_entry.height = "100%"
         
         history_entry_layout = LUIHorizontalLayout(parent = history_entry)
-        history_entry_layout.height = "100%"
         history_entry_layout.width = "100%"
         
         history_entry_timestamp = LUIFormattedLabel()
-        history_entry_timestamp.add("foo")
+        history_entry_timestamp.add(now.strftime("%H:%M:%S.%f"))
         history_entry_layout.add(history_entry_timestamp, "15%")
 
         history_entry_loglevel = LUIFormattedLabel()
-        history_entry_loglevel.add("loglevel")
+        history_entry_loglevel.add(loglevel_to_string[loglevel], color = log_color[loglevel])
         history_entry_layout.add(history_entry_loglevel, "15%")
 
         history_entry_message = LUIFormattedLabel()
@@ -110,10 +107,16 @@ class LogConsole(DirectObject):
             history_entry_message.newline()
         history_entry_layout.add(history_entry_message, "70%")
 
-        self.log_history.add(history_entry, "*")
+        self.log_history.add(history_entry, "?")
         self.log_entries.append((now, loglevel, message, history_entry))
         self.log_history_region.scroll_to_bottom()
 
     def _toggle_loglevel(self, lui_event):
         self.loglevel = (self.loglevel + 1) % self.num_loglevels
+        self.filter_loglevel.color = log_color[self.loglevel]
         self.filter_loglevel.text = loglevel_to_string[self.loglevel]
+        for (timestamp, loglevel, message, history_entry) in self.log_entries:
+            if loglevel < self.loglevel:
+                history_entry.hide()
+            else:
+                history_entry.show()

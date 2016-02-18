@@ -6,8 +6,6 @@ import re
 from direct.showbase.DirectObject import DirectObject
 
 from panda3d.lui import LUIRegion, LUIObject, LUIInputHandler, LUISprite, LUIVerticalLayout
-from LUISkin import LUIDefaultSkin
-from LUIFrame import LUIFrame
 from LUIScrollableRegion import LUIScrollableRegion
 from LUIInputField import LUIInputField
 from LUIFormattedLabel import LUIFormattedLabel
