@@ -1,5 +1,6 @@
 from direct.showbase.DirectObject import DirectObject
 import datetime
+import re
 
 from panda3d.lui import LUIObject, LUIVerticalLayout, LUIHorizontalLayout
 from LUIScrollableRegion import LUIScrollableRegion
@@ -39,8 +40,9 @@ class LogConsole(DirectObject):
         DirectObject.__init__(self)
         self.log_entries = []
         #super(LogConsole, self).__init__()
-        self.loglevel = 0
         self.num_loglevels = 4
+        self.loglevel = 0
+        self.filter_regex = re.compile("")
         self.setup_gui()
         self.accept("log-event", self._log)
     
@@ -79,6 +81,7 @@ class LogConsole(DirectObject):
         self.filter_string.width = "100%"
         self.filter_string.top = 1
         self.filter_string.left = 5
+        self.filter_string.bind("enter", self._set_filter_string)
 
     def get_gui(self):
         return self.gui_root
@@ -115,8 +118,19 @@ class LogConsole(DirectObject):
         self.loglevel = (self.loglevel + 1) % self.num_loglevels
         self.filter_loglevel.color = log_color[self.loglevel]
         self.filter_loglevel.text = loglevel_to_string[self.loglevel]
+        self._refilter()
+
+    def _set_filter_string(self, lui_event):
+        filter_string = self.filter_string.get_value()
+        self.filter_regex = re.compile(filter_string)
+        self._refilter()
+
+    def _refilter(self):
         for (timestamp, loglevel, message, history_entry) in self.log_entries:
-            if loglevel < self.loglevel:
-                history_entry.hide()
-            else:
+            filters = [loglevel >= self.loglevel,
+                       self.filter_regex.search(message) is not None]
+            print(filters)
+            if all(filters):
                 history_entry.show()
+            else:
+                history_entry.hide()
