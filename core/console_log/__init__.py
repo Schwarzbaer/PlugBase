@@ -15,12 +15,12 @@ global plugin_manager
 global interface
 
 def init():
-    global intercafe
+    global interface
     interface = LogConsole()
     plugin_manager.get_interface("console").add_console(LUIButton(text = "Log"), interface.get_gui())
     
 def destroy():
-    global intercafe
+    global interface
     interface.destroy()
     interface = None
 
@@ -53,18 +53,25 @@ class LogConsole(DirectObject):
         self.gui_root = LUIObject()
         self.gui_root.width = "100%"
         self.gui_root.height = "100%"
+        self.gui_root.set_debug_name("DEBUG gui_root")
 
         self.gui_layout = LUIVerticalLayout(parent = self.gui_root,
                                             spacing = 2)
         self.gui_layout.width = "100%"
         self.gui_layout.height = "100%"
-        
+        self.gui_layout.set_debug_name("DEBUG gui_layout")
+
         self.log_history_region = LUIScrollableRegion()
         self.log_history_region.width = "100%"
         self.log_history_region.height = "100%"
+        self.log_history_region.set_debug_name("DEBUG log_history_region")
         self.gui_layout.add(self.log_history_region, "*")
+        
         self.log_history = LUIVerticalLayout(parent = self.log_history_region.content_node,
                                          spacing = 2)
+        self.log_history.width = "100%"
+        self.log_history.height = "100%"
+        self.log_history.set_debug_name("DEBUG log_history")
         
         self.filter_bar = LUIHorizontalLayout(parent = self.gui_layout.cell("?"))
         self.filter_bar.width = "100%"
@@ -79,11 +86,31 @@ class LogConsole(DirectObject):
     
     def _log(self, loglevel, message):
         now = datetime.datetime.now()
-        history_entry = LUIFormattedLabel()
+
+        history_entry = LUIObject()
+        history_entry.set_debug_name("DEBUG history_entry")
+        history_entry.width = "100%"
+        history_entry.height = "100%"
+        
+        history_entry_layout = LUIHorizontalLayout(parent = history_entry)
+        history_entry_layout.height = "100%"
+        history_entry_layout.width = "100%"
+        
+        history_entry_timestamp = LUIFormattedLabel()
+        history_entry_timestamp.add("foo")
+        history_entry_layout.add(history_entry_timestamp, "15%")
+
+        history_entry_loglevel = LUIFormattedLabel()
+        history_entry_loglevel.add("loglevel")
+        history_entry_layout.add(history_entry_loglevel, "15%")
+
+        history_entry_message = LUIFormattedLabel()
         for line in message.split("\n"):
-            history_entry.add(line, font_size = 15, color = log_color[loglevel])
-            history_entry.newline()
-        self.log_history.add(history_entry)
+            history_entry_message.add(line, font_size = 15, color = log_color[loglevel])
+            history_entry_message.newline()
+        history_entry_layout.add(history_entry_message, "70%")
+
+        self.log_history.add(history_entry, "*")
         self.log_entries.append((now, loglevel, message, history_entry))
         self.log_history_region.scroll_to_bottom()
 
