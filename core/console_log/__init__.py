@@ -8,22 +8,30 @@ from LUIButton import LUIButton
 from LUIInputField import LUIInputField
 from LUIFormattedLabel import LUIFormattedLabel
 
-dependencies = ["console"]
+from core.console_python import MagicDonor
+from core.console_python.console import tokenize_magic
+
+dependencies = ["python_console"]
 implements = "log_console"
 
 global base
 global plugin_manager
 global interface
+global log_magic
 
 def init():
     global interface
     interface = LogConsole()
     plugin_manager.get_interface("console").add_console(LUIButton(text = "Log"), interface.get_gui())
-    
+    global log_magic
+    log_magic = LogMagic()
+
 def destroy():
     global interface
     interface.destroy()
     interface = None
+    global log_magic
+    log_magic = None
 
 DEBUG = 0
 INFO = 1
@@ -134,3 +142,21 @@ class LogConsole(DirectObject):
                 history_entry.show()
             else:
                 history_entry.hide()
+
+class LogMagic(MagicDonor):
+    def __init__(self):
+        print("LogMagic")
+        MagicDonor.__init__(self)
+        # super(LogMagic).__init__()
+    
+    @tokenize_magic()
+    def log(self, loglevel, message):
+        """Log an event in the log console.
+        
+        Usage: %log <loglevel> <message>
+        Loglevels are:
+            0: DEBUG
+            1: INFO
+            2: WARNING
+            3: ERROR"""
+        base.messenger.send("log-event", [loglevel, message])

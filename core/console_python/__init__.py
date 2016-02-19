@@ -9,6 +9,7 @@ Interface:
   * add_magic (not implemented):
   * remove_magic (also not implemented):
 """
+from dbus.proxies import Interface
 
 dependencies = ["console"]
 implements = "python_console"
@@ -23,6 +24,7 @@ global plugin_manager # Set by the plugin_manager, used from within the Interact
 global config_manager
 global console # Do I even want this?
 global console_magic
+global interface
 
 def init():
     from plugin import config_manager as cfg_mgr
@@ -35,8 +37,25 @@ def init():
                                                 cm = config_manager,
                                                 console_command = console_magic))
     plugin_manager.get_interface("console").add_console(LUIButton(text = "Python"), console.gui_window.console_frame)
+    global interface
+    interface = ConsoleInterface()
 
 def destroy():
     global console
     console.destroy()
     console = None # FIXME: It's a DirectObject, though
+
+class ConsoleInterface:
+    def add_magic(self, name, method):
+        global console_magic
+        setattr(console_magic, name, method)
+
+class MagicDonor:
+    def __init__(self):
+        print("MagicDonor")
+        console_interface = plugin_manager.get_interface("python_console")
+        for method_name in dir(self):
+            if method_name[0] != '_':
+                print(method_name)
+                method = getattr(self, method_name)
+                console_interface.add_magic(method_name, method)

@@ -1,7 +1,5 @@
 Feature of the Week: PluginManager
 ----------------------------------
-* Make console_magic a module-global object, so that plugins that
-  "extend" it can add their magic.
 * Defined plugin loading order, i.e. repeatedly scanning the plugin
   list from the start.
 * Have logic dealing with missing plugins, inability to import,
