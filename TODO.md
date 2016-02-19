@@ -1,13 +1,14 @@
 Feature of the Week: PluginManager
 ----------------------------------
-* "extends" keyword for plugins. If a set of plugins is loaded,
-  then those that extend others on the list should, if possible, be
-  inited after them. init() should have a list of extended plugins
-  that were loaded before as an argument.
 * Make console_magic a module-global object, so that plugins that
   "extend" it can add their magic.
+* Defined plugin loading order, i.e. repeatedly scanning the plugin
+  list from the start.
 * Have logic dealing with missing plugins, inability to import,
   inability to init.
+* When unloading plugins, implicitly unload (transitively) depending
+  plugins, too.
+* Add functions to analyze the dependency tree.
 
 Small stuff
 -----------
@@ -79,6 +80,7 @@ Towards 1.0
   * Write to graphical window, stdout/stderr and/or file
   * logrotate and/or purge old logs
   * (Only) Ship logs to server if explicitly requested to do so
+  * Make appearance configurable at runtime
 * Config console
 * Core functionality
   * @expose_hooks
@@ -125,9 +127,10 @@ Beyond 1.0
     appropriate file, usually the topmost one, unless explicitly
     specified otherwise.
   * %cfgreload, %cfgdiff
-* Meta-consoles
-  * Have tabbed consoles where tabs can be added, removed, and
-    drag&dropped between consoles. Thus it is up to the user whether
-    he wants one unified or many small consoles. All console
-    functionalities would be separate plugins that depend on console.
+* Mega-consoles
+  * Make console tabs drag&droppable, so that they be added, removed,
+    and moved between consoles, even broken out into windows of their
+    own and added back into others.
 * Plugin downloader
+  * Provide central plugin repository
+  * Support author- and reviewer-signing
