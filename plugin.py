@@ -62,16 +62,19 @@ class PluginManager:
         return loaded_plugins, unloadable_plugins
     
     def unload_plugin(self, plugin_name):
+        if plugin_name not in self.plugins.keys():
+            raise PluginNotLoaded()
         self.plugins[plugin_name].destroy()
         del self.plugins[plugin_name]
     
     def reload_plugin(self, plugin_name):
-        self.unload_plugin(plugin_name)
+        if plugin_name in self.plugins.keys():
+            self.unload_plugin(plugin_name)
         self.load_plugin(plugin_name)
     
     def init_plugin(self, plugin_name):
-        # FIXME: assert that plugin is loaded.
-        #   Have a switch to auto-load it if it isn't.
+        if plugin_name not in self.plugins.keys():
+            raise PluginNotLoaded
         try:
             deps = self.plugins[plugin_name].dependencies
             if all([d in self.active_plugins for d in deps]):
@@ -98,7 +101,7 @@ class PluginManager:
                         inited_plugins.append(plugin_name)
                         del left_to_init[idx]
                         break
-                except PluginNotInitializable:
+                except PluginNotInitializable, PluginNotLoaded:
                     uninitable_plugins.append(plugin_name)
                     del left_to_init[idx]
                     break
