@@ -145,7 +145,6 @@ class LogConsole(DirectObject):
 
 class LogMagic(MagicDonor):
     def __init__(self):
-        print("LogMagic")
         MagicDonor.__init__(self)
         # super(LogMagic).__init__()
     

@@ -6,6 +6,21 @@ from direct.showbase.DirectObject import DirectObject
 
 global config_manager
 
+class PluginNotFound(Exception):
+    pass
+
+class PluginNotLoadable(Exception):
+    pass
+
+class PluginNotInitializable(Exception):
+    pass
+
+class PluginNotLoaded(Exception):
+    pass
+
+class PluginNotInitialized(Exception):
+    pass
+
 class PluginManager:
     def __init__(self, config_files = None):
         self.plugins = {}
@@ -17,34 +32,34 @@ class PluginManager:
     def startup(self):
         # Load all plugins
         init_on_startup = config_manager.get("plugins", "init_on_startup").split(",")
-        for plugin_name in init_on_startup:
-            self.load_plugin(plugin_name)
-        left_to_init = self.plugins.keys()
-        
-        # Init them.
-        # FIXME: Can we get some topological sorting in here? You know, "the right way"?
-        while True:
-            loaded_one = False
-            left_to_init_post = []
-            for plugin_name in left_to_init:
-                inited = self.init_plugin(plugin_name)
-                loaded_one = loaded_one or inited
-                if not inited:
-                    left_to_init_post.append(plugin_name)
-                else:
-                    print("Inited %s" % (plugin_name, ))
-            left_to_init = left_to_init_post
-            if (len(left_to_init) == 0) or (not loaded_one):
-                break
-        
-        if left_to_init:
-            print("Couldn't load: %s" % (", ".join(left_to_init) ,))
+        loaded_plugins, unloadable_plugins = self.load_plugins(init_on_startup)
+        inited_plugins, uninitable_plugins = self.init_plugins(loaded_plugins)
+        if inited_plugins:
+            print("Initialized plugins : %s" % (", ".join(inited_plugins) ,))
+        if uninitable_plugins:
+            print("Could not initialize: %s" % (", ".join(uninitable_plugins) ,))
+        if unloadable_plugins:
+            print("Could not load      : %s" % (", ".join(unloadable_plugins) ,))
     
     def load_plugin(self, plugin_name):
         directory = config_manager.get("plugin_dirs", plugin_name)
-        plugin = import_module(directory)
+        try:
+            plugin = import_module(directory)
+        except SyntaxError:
+            raise PluginNotLoadable()
         plugin.plugin_manager = self
         self.plugins[plugin_name] = plugin
+    
+    def load_plugins(self, plugin_list):
+        loaded_plugins = []
+        unloadable_plugins = []
+        for plugin_name in plugin_list:
+            try:
+                self.load_plugin(plugin_name)
+                loaded_plugins.append(plugin_name)
+            except PluginNotLoadable:
+                unloadable_plugins.append(plugin_name)
+        return loaded_plugins, unloadable_plugins
     
     def unload_plugin(self, plugin_name):
         self.plugins[plugin_name].destroy()
@@ -57,14 +72,41 @@ class PluginManager:
     def init_plugin(self, plugin_name):
         # FIXME: assert that plugin is loaded.
         #   Have a switch to auto-load it if it isn't.
-        deps = self.plugins[plugin_name].dependencies
-        if all([d in self.active_plugins for d in deps]):
-            self.plugins[plugin_name].init()
-            self.active_plugins.append(plugin_name)
-            return True
-        else:
-            return False
+        try:
+            deps = self.plugins[plugin_name].dependencies
+            if all([d in self.active_plugins for d in deps]):
+                self.plugins[plugin_name].init()
+                self.active_plugins.append(plugin_name)
+                return True
+            else:
+                return False
+        except:
+            raise PluginNotInitializable
     
+    def init_plugins(self, plugin_list):
+        inited_plugins = []
+        uninitable_plugins = []
+        left_to_init = [pn for pn in plugin_list]
+        continue_initing = True
+        
+        while continue_initing:
+            for idx in range(len(left_to_init)):
+                plugin_name = left_to_init[idx]
+                try:
+                    inited = self.init_plugin(plugin_name)
+                    if inited:
+                        inited_plugins.append(plugin_name)
+                        del left_to_init[idx]
+                        break
+                except PluginNotInitializable:
+                    uninitable_plugins.append(plugin_name)
+                    del left_to_init[idx]
+                    break
+            else:
+                continue_initing = False
+        return inited_plugins, left_to_init + uninitable_plugins
+            
+
     def get_loaded_plugins(self):
         return self.plugins.keys()
     

@@ -51,7 +51,6 @@ class ConsoleInterface:
 
 class MagicDonor:
     def __init__(self):
-        print("MagicDonor")
         console_interface = plugin_manager.get_interface("python_console")
         for method_name in dir(self):
             if method_name[0] != '_':
