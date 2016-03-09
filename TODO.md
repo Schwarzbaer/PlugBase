@@ -1,18 +1,21 @@
 Feature of the Week: PluginManager
 ----------------------------------
-* Defined plugin loading order, i.e. repeatedly scanning the plugin
-  list from the start.
-* Have logic dealing with missing plugins, inability to import,
-  inability to init.
 * When unloading plugins, implicitly unload (transitively) depending
   plugins, too.
 * Add functions to analyze the dependency tree.
+* "extends" plugin attribute to be informed of other plugin's init /
+  destroy.
+* Properties that relate to ConfigManager values, i.e.:
+    StringProperty(42, "section", "variable", validate=lambda x:True, 
+                   change_handler=lambda x: pass)
+  Also have:
+    GenericProperty(<default>, ..., process=lambda x:x)
+  where process takes the string coming from the ConfigManager and
+  can be turned into any kind of data structure.
 
 Small stuff
 -----------
 * Implement .destroy() in console
-* console: Create ConsoleMagic class to programmatically extend
-  magic commands.
 * Document modules, especially events sent / accepted by plugins
 * Document PlugBase, especially plugin manager, config manager,
   decorators, helper functions
@@ -125,6 +128,7 @@ Beyond 1.0
     appropriate file, usually the topmost one, unless explicitly
     specified otherwise.
   * %cfgreload, %cfgdiff
+  * Maybe provide descriptors for using config values as attributes?
 * Mega-consoles
   * Make console tabs drag&droppable, so that they be added, removed,
     and moved between consoles, even broken out into windows of their

@@ -285,7 +285,7 @@ class Console(DirectObject, BufferingInterpreter):
         if input_text != '':
             self.set_write_mode("font_color_entered")
             self.write(input_text)
-            if input_text[0] == '%':
+            if input_text.startswith('%'):
                 # Apply console magic
                 space_pos = input_text.find(" ")
                 if space_pos != -1:
