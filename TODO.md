@@ -53,6 +53,8 @@ Towards 1.0
       * Lists of, and players for, media assets
         * Integrate the .bam streamer, maybe as its own plugin.
       * List of code snippets (to hook into tasks and events).
+      * List and exemplars of objects in pools.
+        * Create inspection interfaces, i.e. for ModelPool
   * Interpreter: Input
     * If an input was incomplete, caused a syntax error or
       traceback, it should not be written to history, and the input
@@ -76,6 +78,12 @@ Towards 1.0
 * debug tools
   * render.explore()
   * light.showFrustum()
+  * NP.showBounds()
+  * The equivalent for colliders and physics bodies
+  * Tool for temporarily taking over the camera
+    * Create a camera that colocates with the currently chosen
+      camera, takes over its DisplayBuffer, can be controlled
+      manually, and at the end restores the original state.
 * Logging console
   * Use for regular logging and for debugging / profiling information
   * Write to graphical window, stdout/stderr and/or file
