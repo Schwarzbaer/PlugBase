@@ -2,8 +2,9 @@ PlugBase
 ========
 
 A plugin system and a set of standard plugins, so that writing a game
-consists only of writing the game, and the game is easy to make
-completely moddable.
+consists only of writing the game (and not of tenthousand details big
+and small that make up the difference between a prototype and a
+polished game), and the game is easy to make completely moddable.
 
 PlugBase features:
 * Plugin loading and automatically ordered initialization
