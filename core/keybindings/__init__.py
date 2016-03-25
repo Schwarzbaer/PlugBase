@@ -7,7 +7,7 @@ import sys
 global base
 global keybindings_manager
 
-def init():
+def build():
     global keybindings_manager
     keybindings_manager = KeybindingsManager()
     keybindings_manager.test()

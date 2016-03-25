@@ -450,7 +450,6 @@ class ConsoleCommands:
         Shows which plugins are loaded, and which ones are loaded and
         active.
         """
-        
         loaded = self.plugin_manager.get_loaded_plugins()
         active = self.plugin_manager.get_active_plugins()
         for plugin in loaded:
@@ -459,6 +458,63 @@ class ConsoleCommands:
             else:
                 print(plugin + " (loaded)")
 
+    @tokenize_magic()
+    def plhelp(self, plugin_name):
+        """Show docstring for plugin.
+        
+        Usage: %plhelp plugin_name"""
+        # FIXME: There should be logic here, in case that the plugin
+        # can't be found.
+        print(self.plugin_manager.plugins[plugin_name].__doc__)
+
+    @tokenize_magic()
+    def plload(self, plugin_name):
+        """Load and build a plugin.
+        
+        Usage: %plload plugin_name"""
+        # FIXME: There should be logic here, in case that the plugin
+        # can't be found or built.
+        # FIXME: Also, how about a just-load option?
+        self.plugin_manager.load_plugin(plugin_name)
+
+    @tokenize_magic()
+    def plunload(self, plugin_name):
+        """Destroy and unload a plugin.
+        
+        Usage: %plunload plugin_name"""
+        # FIXME: There should be logic here, in case that the plugin
+        # isn't active, or even loaded.
+        self.plugin_manager.unload_plugin(plugin_name)
+
+    @tokenize_magic()
+    def plreload(self, plugin_name):
+        """Reload a plugin, implicitly destroying and rebuilding it.
+        
+        Usage: %plreload plugin_name"""
+        self.plugin_manager.reload_plugin(plugin_name)
+
+    @tokenize_magic()
+    def plbuild(self, plugin_name):
+        """Build a loaded but inactive plugin.
+        
+        Usage: %plbuild plugin_name"""
+        # FIXME: There should be logic here, in case that the plugin
+        # can't be built. Maybe there should also be a check whether
+        # it is even loaded in the first place, or already active?
+        self.plugin_manager.build_plugin(plugin_name)
+    
+    @tokenize_magic()
+    def pldestroy(self, plugin_name):
+        """Destroy an active plugin, but keep it loaded.
+        
+        Usage: %pldestroy plugin_name"""
+        # FIXME: There should be logic here, in case that the plugin
+        # can't be built. Maybe there should also be a check whether
+        # it is even loaded in the first place, or already active?
+        self.plugin_manager.destroy_plugin(plugin_name)
+    
+    # Config-related magic
+    
     @tokenize_magic()
     def cfglist(self, *args):
         """Show configuration data.
@@ -496,51 +552,3 @@ class ConsoleCommands:
         being the last one in the list of config files that actually
         exists."""
         self.config_manager.write()
-
-    @tokenize_magic()
-    def plhelp(self, plugin_name):
-        """Show docstring for plugin.
-        
-        Usage: %plhelp plugin_name"""
-        # FIXME: There should be logic here, in case that the plugin
-        # can't be found.
-        print(self.plugin_manager.plugins[plugin_name].__doc__)
-
-    @tokenize_magic()
-    def plload(self, plugin_name):
-        """Load and initialize a plugin.
-        
-        Usage: %plload plugin_name"""
-        # FIXME: There should be logic here, in case that the plugin
-        # can't be found or inited.
-        # FIXME: Also, how about a just-load option?
-        self.plugin_manager.load_plugin(plugin_name)
-        self.plugin_manager.init_plugin(plugin_name)
-
-    @tokenize_magic()
-    def plreload(self, plugin_name):
-        """Unload, load and initialize a plugin.
-        
-        Usage: %plreload plugin_name"""
-        self.plugin_manager.reload_plugin(plugin_name)
-        self.plugin_manager.init_plugin(plugin_name)
-
-    @tokenize_magic()
-    def plunload(self, plugin_name):
-        """Destroy and unload a plugin.
-        
-        Usage: %plunload plugin_name"""
-        # FIXME: There should be logic here, in case that the plugin
-        # isn't active, or even loaded.
-        self.plugin_manager.unload_plugin(plugin_name)
-
-    @tokenize_magic()
-    def plinit(self, plugin_name):
-        """Initialize a loaded but inactive plugin.
-        
-        Usage: %plinit plugin_name"""
-        # FIXME: There should be logic here, in case that the plugin
-        # can't be inited. Maybe there should also be a check whether
-        # it is even loaded in the first place, or already active?
-        self.plugin_manager.load_plugin(plugin_name)
-        self.plugin_manager.init_plugin(plugin_name)

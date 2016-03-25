@@ -25,7 +25,7 @@ global console # Do I even want this?
 global console_magic
 global interface
 
-def init():
+def build():
     from plugin import config_manager as cfg_mgr
     global config_manager
     config_manager = cfg_mgr

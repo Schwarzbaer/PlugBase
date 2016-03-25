@@ -12,7 +12,7 @@ global plugin_manager
 
 global smiley
 
-def init():
+def build():
     global smiley
     smiley = DemoSmiley()
 

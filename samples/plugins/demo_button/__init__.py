@@ -10,7 +10,7 @@ global plugin_manager # Set by the plugin_manager, used from within the Interact
 
 global button
 
-def init():
+def build():
     global button
     button = DirectButton(parent = base.aspect2d,
                           frameSize = (base.a2dRight,

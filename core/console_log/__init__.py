@@ -19,7 +19,7 @@ global plugin_manager
 global interface
 global log_magic
 
-def init():
+def build():
     global interface
     interface = LogConsole()
     plugin_manager.get_interface("console").add_console(LUIButton(text = "Log"), interface.get_gui())

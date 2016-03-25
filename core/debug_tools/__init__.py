@@ -7,7 +7,7 @@ from panda3d.core import PStatClient
 global base
 global listener
 
-def init():
+def build():
     global listener
     listener = Listener()
 

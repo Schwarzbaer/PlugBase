@@ -2,7 +2,7 @@
 
 This is simply a demonstration of how to write plugins. Every plugin
 for PlugBase is a Python module, and has two attributes, dependencies
-and implements, and two functions, init() and destroy().
+and implements, and two functions, build() and destroy().
 
 implements is a string that describes the functionality implemented
 by the plugin, and with it also implies the interface that should be
@@ -20,9 +20,9 @@ Once a plugin is loaded and its dependencies are initialized, then
 the plugin itself is initialized. First, the plugin manager sets the
 module's attribute plugin_manager to iself, as a way for the plugin
 to interact with the rest of the plugin infrastructure. Then the
-plugin's init() is called. The plugin now should do what is necessary
-to get up and running, and ready for other plugins that depend on it
-to be initialized.
+plugin's build() is called. The plugin now should do what is
+necessary to get up and running, and ready for other plugins that
+depend on it to be initialized.
 
 Finally, when the plugin is unloaded, destroy() is called. The plugin
 should tear down everything with regards to it, including setting
@@ -40,7 +40,7 @@ implements = ""
 
 global plugin_manager
 
-def init():
+def build():
     print("Game-side plugin initialized")
 
 def destroy():

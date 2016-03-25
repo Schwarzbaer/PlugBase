@@ -3,7 +3,7 @@ Feature of the Week: PluginManager
 * When unloading plugins, implicitly unload (transitively) depending
   plugins, too.
 * Add functions to analyze the dependency tree.
-* "extends" plugin attribute to be informed of other plugin's init /
+* "extends" plugin attribute to be informed of other plugin's build /
   destroy.
 * Properties that relate to ConfigManager values, i.e.:
     StringProperty(42, "section", "variable", validate=lambda x:True, 
@@ -94,7 +94,7 @@ Towards 1.0
 * Core functionality
   * @expose_hooks
   * Move plugin.* to plugbase?
-  * can_use plugin var for deferred init()?
+  * can_use plugin var for deferred build()?
 * Capabilities checking
   * See GSG and GraphicsPipe API.
 * Input bindings, mappings and contexts

@@ -1,6 +1,6 @@
 import weakref
 
-from importlib import import_module
+from importlib import import_module#, reload
 from ConfigParser import SafeConfigParser
 from direct.showbase.DirectObject import DirectObject
 
@@ -12,13 +12,13 @@ class PluginNotFound(Exception):
 class PluginNotLoadable(Exception):
     pass
 
-class PluginNotInitializable(Exception):
+class PluginNotBuildable(Exception):
     pass
 
 class PluginNotLoaded(Exception):
     pass
 
-class PluginNotInitialized(Exception):
+class PluginNotBuilt(Exception):
     pass
 
 class PluginManager:
@@ -31,15 +31,15 @@ class PluginManager:
     
     def startup(self):
         # Load all plugins
-        init_on_startup = config_manager.get("plugins", "init_on_startup").split(",")
-        loaded_plugins, unloadable_plugins = self.load_plugins(init_on_startup)
-        inited_plugins, uninitable_plugins = self.init_plugins(loaded_plugins)
-        if inited_plugins:
-            print("Initialized plugins : %s" % (", ".join(inited_plugins) ,))
-        if uninitable_plugins:
-            print("Could not initialize: %s" % (", ".join(uninitable_plugins) ,))
+        build_on_startup = config_manager.get("plugins", "build_on_startup").split(",")
+        loaded_plugins, unloadable_plugins = self.load_plugins(build_on_startup)
+        built_plugins, unbuildable_plugins = self.build_plugins(loaded_plugins)
+        if built_plugins:
+            print("Built plugins  : %s" % (", ".join(built_plugins) ,))
+        if unbuildable_plugins:
+            print("Could not build: %s" % (", ".join(unbuildable_plugins) ,))
         if unloadable_plugins:
-            print("Could not load      : %s" % (", ".join(unloadable_plugins) ,))
+            print("Could not load : %s" % (", ".join(unloadable_plugins) ,))
     
     def load_plugin(self, plugin_name):
         directory = config_manager.get("plugin_dirs", plugin_name)
@@ -67,49 +67,55 @@ class PluginManager:
         self.plugins[plugin_name].destroy()
         del self.plugins[plugin_name]
     
+    # TODO: unload_plugins
+    
     def reload_plugin(self, plugin_name):
         if plugin_name in self.plugins.keys():
-            self.unload_plugin(plugin_name)
-        self.load_plugin(plugin_name)
+            self.plugins[plugin_name].destroy()
+            self.plugins[plugin_name] = reload(self.plugins[plugin_name])
+            self.build_plugin(plugin_name)
+        else:
+            raise PluginNotLoaded
     
-    def init_plugin(self, plugin_name):
+    def build_plugin(self, plugin_name):
         if plugin_name not in self.plugins.keys():
             raise PluginNotLoaded
         try:
             deps = self.plugins[plugin_name].dependencies
             if all([d in self.active_plugins for d in deps]):
-                self.plugins[plugin_name].init()
+                self.plugins[plugin_name].build()
                 self.active_plugins.append(plugin_name)
                 return True
             else:
                 return False
         except:
-            raise PluginNotInitializable
+            raise PluginNotBuildable
     
-    def init_plugins(self, plugin_list):
-        inited_plugins = []
-        uninitable_plugins = []
-        left_to_init = [pn for pn in plugin_list]
-        continue_initing = True
+    def build_plugins(self, plugin_list):
+        built_plugins = []
+        unbuildable_plugins = []
+        left_to_build = [pn for pn in plugin_list]
+        continue_building = True
         
-        while continue_initing:
-            for idx in range(len(left_to_init)):
-                plugin_name = left_to_init[idx]
+        while continue_building:
+            for idx in range(len(left_to_build)):
+                plugin_name = left_to_build[idx]
                 try:
-                    inited = self.init_plugin(plugin_name)
-                    if inited:
-                        inited_plugins.append(plugin_name)
-                        del left_to_init[idx]
+                    built = self.build_plugin(plugin_name)
+                    if built:
+                        built_plugins.append(plugin_name)
+                        del left_to_build[idx]
                         break
-                except PluginNotInitializable, PluginNotLoaded:
-                    uninitable_plugins.append(plugin_name)
-                    del left_to_init[idx]
+                except PluginNotBuildable, PluginNotLoaded:
+                    unbuildable_plugins.append(plugin_name)
+                    del left_to_build[idx]
                     break
             else:
-                continue_initing = False
-        return inited_plugins, left_to_init + uninitable_plugins
-            
-
+                continue_building = False
+        return built_plugins, left_to_build + unbuildable_plugins
+    
+    # TODO: destroy_pligin
+    
     def get_loaded_plugins(self):
         return self.plugins.keys()
     

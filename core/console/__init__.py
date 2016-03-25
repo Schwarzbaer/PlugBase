@@ -11,7 +11,7 @@ global base
 global plugin_manager # Set by the plugin_manager, used from within the InteractiveInterpreter
 global interface
 
-def init():
+def build():
     global interface
     interface = ConsoleFrame()
 

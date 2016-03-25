@@ -3,7 +3,7 @@ implements = "game_side_test"
 
 global plugin_manager
 
-def init():
+def build():
     print("Game-side test was inited.")
 
 def destroy():
