@@ -2,3 +2,4 @@
 
 implements = "unbuildable"
 depends = []
+extends = []

@@ -132,7 +132,6 @@ class ConsoleGUI:
         self.history_region.scroll_to_bottom()
 
     def enter(self, event):
-        print("text was entered. " + str(event))
         should_continue = self.interpreter.command(self.command_line.get_value()+"\n")
         if not should_continue:
             self.command_line.set_value("")

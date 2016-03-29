@@ -1,5 +1,6 @@
 dependencies = []
 implements = "demo_smiley"
+extends = []
 
 from direct.showbase.DirectObject import DirectObject
 from direct.task.Task import Task
@@ -12,7 +13,9 @@ global plugin_manager
 
 global smiley
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
     global smiley
     smiley = DemoSmiley()
 

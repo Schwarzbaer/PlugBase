@@ -1,5 +1,6 @@
 dependencies = ["demo_smiley"]
 implements = "demo_button"
+extends = []
 
 from direct.gui.DirectGui import DirectButton
 
@@ -10,7 +11,9 @@ global plugin_manager # Set by the plugin_manager, used from within the Interact
 
 global button
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
     global button
     button = DirectButton(parent = base.aspect2d,
                           frameSize = (base.a2dRight,

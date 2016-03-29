@@ -1,13 +1,17 @@
 dependencies = []
 implements = "debug_tools"
+extends = []
 
 from direct.showbase.DirectObject import DirectObject
 from panda3d.core import PStatClient
 
 global base
 global listener
+global plugin_manager
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
     global listener
     listener = Listener()
 

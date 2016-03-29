@@ -11,27 +11,40 @@ from LUIFormattedLabel import LUIFormattedLabel
 from core.console_python import MagicDonor
 from core.console_python.console import tokenize_magic
 
-dependencies = ["python_console"]
-implements = "log_console"
+dependencies = ['console']
+implements = 'log_console'
+extends = ['python_console']
 
 global base
 global plugin_manager
 global interface
 global log_magic
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
+    print("--- Building log console")
     global interface
     interface = LogConsole()
     plugin_manager.get_interface("console").add_console(LUIButton(text = "Log"), interface.get_gui())
-    global log_magic
-    log_magic = LogMagic()
 
 def destroy():
+    print("--- Destroying log console")
     global interface
     interface.destroy()
     interface = None
-    global log_magic
-    log_magic = None
+
+def extend(plugin_name):
+    print("--- log console extends "+plugin_name)
+    if plugin_name == 'python_console':
+        global log_magic
+        log_magic = LogMagic()
+
+def unextend(plugin_name):
+    print("--- log console un-extends "+plugin_name)
+    if plugin_name == 'python_console':
+        global log_magic
+        log_magic = None
 
 DEBUG = 0
 INFO = 1
@@ -93,6 +106,10 @@ class LogConsole(DirectObject):
 
     def get_gui(self):
         return self.gui_root
+    
+    def destroy(self):
+        # TODO: Implement
+        pass
     
     def _log(self, loglevel, message):
         now = datetime.datetime.now()

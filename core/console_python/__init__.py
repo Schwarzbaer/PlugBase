@@ -12,6 +12,7 @@ from dbus.proxies import Interface
 
 dependencies = ["console"]
 implements = "python_console"
+extends = []
 
 from LUILabel import LUILabel
 from LUIButton import LUIButton
@@ -25,7 +26,9 @@ global console # Do I even want this?
 global console_magic
 global interface
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
     from plugin import config_manager as cfg_mgr
     global config_manager
     config_manager = cfg_mgr

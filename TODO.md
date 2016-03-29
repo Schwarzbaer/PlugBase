@@ -3,8 +3,6 @@ Feature of the Week: PluginManager
 * When unloading plugins, implicitly unload (transitively) depending
   plugins, too.
 * Add functions to analyze the dependency tree.
-* "extends" plugin attribute to be informed of other plugin's build /
-  destroy.
 * Properties that relate to ConfigManager values, i.e.:
     StringProperty(42, "section", "variable", validate=lambda x:True, 
                    change_handler=lambda x: pass)
@@ -15,7 +13,8 @@ Feature of the Week: PluginManager
 
 Small stuff
 -----------
-* Implement .destroy() in console
+* Implement .destroy() in console, console_log.LogConsole and others
+* console_python.MagicDonor needs a method to undo its transplants
 * Document modules, especially events sent / accepted by plugins
 * Document PlugBase, especially plugin manager, config manager,
   decorators, helper functions
@@ -72,6 +71,7 @@ Towards 1.0
   * Check plugin default configs for unspecified values
     (ConfigParser.NoOptionError)
   * Proper exceptions when not finding values
+  * Try not to use Panda3D's events
 * keybindings
   * Well, actually implement this.
   * Optional menu

@@ -1,5 +1,6 @@
 dependencies = ["keybindings"]
 implements = "console"
+extends = []
 
 from direct.showbase.DirectObject import DirectObject
 from panda3d.lui import LUIRegion, LUIInputHandler
@@ -8,10 +9,12 @@ from LUISkin import LUIDefaultSkin
 from LUITabbedFrame import LUITabbedFrame
 
 global base
-global plugin_manager # Set by the plugin_manager, used from within the InteractiveInterpreter
+global plugin_manager
 global interface
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
     global interface
     interface = ConsoleFrame()
 

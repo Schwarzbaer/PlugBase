@@ -37,10 +37,13 @@ to be empty, and the rest will be used as a detailed description.
 
 dependencies = []
 implements = ""
+extends = []
 
 global plugin_manager
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
     print("Game-side plugin initialized")
 
 def destroy():

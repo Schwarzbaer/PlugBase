@@ -1,13 +1,17 @@
 dependencies = []
 implements = "keybindings"
+extends = []
 
 from direct.showbase.DirectObject import DirectObject
 import sys
 
 global base
 global keybindings_manager
+global plugin_manager
 
-def build():
+def build(pm):
+    global plugin_manager
+    plugin_manager = pm
     global keybindings_manager
     keybindings_manager = KeybindingsManager()
     keybindings_manager.test()

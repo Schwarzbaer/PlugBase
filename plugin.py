@@ -3,6 +3,7 @@ import weakref
 from importlib import import_module#, reload
 from ConfigParser import SafeConfigParser
 from direct.showbase.DirectObject import DirectObject
+import traceback
 
 global config_manager
 
@@ -25,9 +26,30 @@ class PluginManager:
     def __init__(self, config_files = None):
         self.plugins = {}
         self.active_plugins = []
+        self.extenders = {} # "extender": set(extendees
         global config_manager
         config_manager = ConfigManager(config_files)
         self.startup()
+    
+    def _get_extenders(self, extendee):
+        extenders = []
+        for extender, extendees in self.extenders.iteritems():
+            if extendee in extendees:
+                extenders.append(extender)
+        return extenders
+    
+    def _get_extendees(self, plugin_name):
+        assert plugin_name in self.extenders.keys(), "Extender not registered"
+        all_extendees = self.extenders[plugin_name]
+        return [extendee for extendee in all_extendees if extendee in self.active_plugins]
+    
+    def _add_extender(self, extender, extendees):
+        assert extender not in self.extenders.keys(), "Extender already registered"
+        self.extenders[extender] = set(extendees)
+    
+    def _remove_extender(self, extender):
+        assert extender in self.extenders.keys(), "Extender not registered"
+        del self.extenders[extender]
     
     def startup(self):
         # Load all plugins
@@ -47,7 +69,7 @@ class PluginManager:
             plugin = import_module(directory)
         except SyntaxError:
             raise PluginNotLoadable()
-        plugin.plugin_manager = self
+        #plugin.plugin_manager = self
         self.plugins[plugin_name] = plugin
     
     def load_plugins(self, plugin_list):
@@ -64,6 +86,8 @@ class PluginManager:
     def unload_plugin(self, plugin_name):
         if plugin_name not in self.plugins.keys():
             raise PluginNotLoaded()
+        # FIXME: At this point, the plugin should already be
+        # destroyed. Maybe raise an error?
         self.plugins[plugin_name].destroy()
         del self.plugins[plugin_name]
     
@@ -83,12 +107,18 @@ class PluginManager:
         try:
             deps = self.plugins[plugin_name].dependencies
             if all([d in self.active_plugins for d in deps]):
-                self.plugins[plugin_name].build()
+                self.plugins[plugin_name].build(self)
                 self.active_plugins.append(plugin_name)
+                self._add_extender(plugin_name, self.plugins[plugin_name].extends)
+                for extender in self._get_extenders(plugin_name):
+                    self.plugins[extender].extend(plugin_name)
+                for extendee in self._get_extendees(plugin_name):
+                    self.plugins[plugin_name].extend(extendee)
                 return True
             else:
                 return False
-        except:
+        except Exception as e:
+            # FIXME: Add original exception
             raise PluginNotBuildable
     
     def build_plugins(self, plugin_list):
@@ -114,7 +144,18 @@ class PluginManager:
                 continue_building = False
         return built_plugins, left_to_build + unbuildable_plugins
     
-    # TODO: destroy_pligin
+    def destroy_plugin(self, plugin_name):
+        # TODO: Also destroy plugins that depend on this one
+        if plugin_name not in self.active_plugins:
+            raise PluginNotBuilt
+        for extendee in self._get_extendees(plugin_name):
+            self.plugins[plugin_name].unextend(extendee)
+        for extender in self._get_extenders(plugin_name):
+            self.plugins[extender].unextend(plugin_name)
+        self.plugins[plugin_name].destroy()
+        del self.active_plugins[self.active_plugins.index(plugin_name)]
+
+    # TODO: destroy_pligins
     
     def get_loaded_plugins(self):
         return self.plugins.keys()
