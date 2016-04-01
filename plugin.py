@@ -51,7 +51,25 @@ class PluginManager:
         assert extender in self.extenders.keys(), "Extender not registered"
         del self.extenders[extender]
     
+    def get_dependants(self, root_plugin_name, only_actives=True):
+        # TODO: Respect only_actives
+        dependants = [root_plugin_name]
+        dependants_added = True
+        while dependants_added:
+            dependants_added = False
+            for plugin_name, plugin in self.plugins.iteritems():
+                if not only_actives or plugin_name in self.active_plugins:
+                    plugin_deps = plugin.dependencies
+                    if any([dep in dependants for dep in plugin_deps]):
+                        if plugin_name not in dependants:
+                            dependants.append(plugin_name)
+                            dependants_added = True
+        del dependants[dependants.index(root_plugin_name)]
+        return dependants            
+    
     def startup(self):
+        """Try to build all plugins that are named in the config
+        file's build_on_startup."""
         # Load all plugins
         build_on_startup = config_manager.get("plugins", "build_on_startup").split(",")
         loaded_plugins, unloadable_plugins = self.load_plugins(build_on_startup)
@@ -64,6 +82,7 @@ class PluginManager:
             print("Could not load : %s" % (", ".join(unloadable_plugins) ,))
     
     def load_plugin(self, plugin_name):
+        assert plugin_name not in self.plugins.keys(), "Plugin already loaded"
         directory = config_manager.get("plugin_dirs", plugin_name)
         try:
             plugin = import_module(directory)
