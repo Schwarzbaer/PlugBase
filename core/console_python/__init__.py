@@ -8,7 +8,6 @@ Interface:
   create an instance of that class.
 * remove_magic (not implemented)
 """
-from dbus.proxies import Interface
 
 dependencies = ["console"]
 implements = "python_console"
@@ -26,6 +25,7 @@ global console # Do I even want this?
 global console_magic
 global interface
 
+
 def build(pm):
     global plugin_manager
     plugin_manager = pm
@@ -42,21 +42,38 @@ def build(pm):
     global interface
     interface = ConsoleInterface()
 
+
 def destroy():
     global console
     console.destroy()
     console = None # FIXME: It's a DirectObject, though
+
 
 class ConsoleInterface:
     def add_magic(self, name, method):
         global console_magic
         setattr(console_magic, name, method)
 
+    def remove_magic(self, name):
+        global console_magic
+        delattr(console_magic, name)
+
 class MagicDonor:
     def __init__(self):
+        self._magic_commands = [method_name
+                                for method_name in dir(self)
+                                if not method_name.startswith('_')]
+        self._give_magic()
+        
+    def _give_magic(self):
         console_interface = plugin_manager.get_interface("python_console")
-        for method_name in dir(self):
-            if method_name[0] != '_':
-                print(method_name)
-                method = getattr(self, method_name)
-                console_interface.add_magic(method_name, method)
+        for method_name in self._magic_commands:
+            # TODO: Log method_name
+            method = getattr(self, method_name)
+            console_interface.add_magic(method_name, method)
+
+    def _take_magic(self):
+        console_interface = plugin_manager.get_interface("python_console")
+        for method_name in self._magic_commands:
+            # TODO: Log method_name
+            console_interface.remove_magic(method_name)

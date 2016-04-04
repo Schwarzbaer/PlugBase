@@ -44,6 +44,7 @@ def unextend(plugin_name):
     print("--- log console un-extends "+plugin_name)
     if plugin_name == 'python_console':
         global log_magic
+        log_magic._take_magic()
         log_magic = None
 
 DEBUG = 0
