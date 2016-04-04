@@ -51,7 +51,7 @@ class PluginManager:
         assert extender in self.extenders.keys(), "Extender not registered"
         del self.extenders[extender]
     
-    def get_dependants(self, root_plugin_name, only_actives=True):
+    def _get_dependants(self, root_plugin_name, only_actives=True):
         # TODO: Respect only_actives
         dependants = [root_plugin_name]
         dependants_added = True
@@ -82,13 +82,15 @@ class PluginManager:
             print("Could not load : %s" % (", ".join(unloadable_plugins) ,))
     
     def load_plugin(self, plugin_name):
+        """Load a plugin.
+        Throws PluginNotLoadable if the plugin can't be imported"""
         assert plugin_name not in self.plugins.keys(), "Plugin already loaded"
         directory = config_manager.get("plugin_dirs", plugin_name)
         try:
             plugin = import_module(directory)
         except SyntaxError:
+            # TODO: Embed actual exception and stacktrace
             raise PluginNotLoadable()
-        #plugin.plugin_manager = self
         self.plugins[plugin_name] = plugin
     
     def load_plugins(self, plugin_list):
@@ -99,18 +101,29 @@ class PluginManager:
                 self.load_plugin(plugin_name)
                 loaded_plugins.append(plugin_name)
             except PluginNotLoadable:
+                # FIXME: Embedded exception and stack trace (once
+                # those exist; there's a TODO in load_plugin about
+                # that) should be communicated
                 unloadable_plugins.append(plugin_name)
         return loaded_plugins, unloadable_plugins
     
-    def unload_plugin(self, plugin_name):
+    def unload_plugin(self, plugin_name, implicit_destroy=True, unload_dependants=True):
         if plugin_name not in self.plugins.keys():
             raise PluginNotLoaded()
-        # FIXME: At this point, the plugin should already be
-        # destroyed. Maybe raise an error?
-        self.plugins[plugin_name].destroy()
+        if not implicit_destroy:
+            assert plugin_name not in self.active_plugins, "Plugin is still active"
+        else:
+            # First the dependents, then the plugin itself
+            deps = self._get_dependants(plugin_name, only_actives=True)
+            for dep in deps:
+                self.destroy_plugin(dep)
+            if plugin_name in self.active_plugins:
+                self.destroy_plugin(plugin_name)
+        if unload_dependants:
+            deps = self._get_dependants(plugin_name, only_actives=False)
+            for dep in deps:
+                self.unload_plugin(dep, unload_dependants=False)
         del self.plugins[plugin_name]
-    
-    # TODO: unload_plugins
     
     def reload_plugin(self, plugin_name):
         if plugin_name in self.plugins.keys():
@@ -120,6 +133,8 @@ class PluginManager:
         else:
             raise PluginNotLoaded
     
+    # Building and destroying
+
     def build_plugin(self, plugin_name):
         if plugin_name not in self.plugins.keys():
             raise PluginNotLoaded
@@ -164,6 +179,7 @@ class PluginManager:
         return built_plugins, left_to_build + unbuildable_plugins
     
     def destroy_plugin(self, plugin_name):
+        deps = self._get_dependants(plugin_name, only_actives=True)
         # TODO: Also destroy plugins that depend on this one
         if plugin_name not in self.active_plugins:
             raise PluginNotBuilt
