@@ -23,25 +23,21 @@ global log_magic
 def build(pm):
     global plugin_manager
     plugin_manager = pm
-    print("--- Building log console")
     global interface
     interface = LogConsole()
     plugin_manager.get_interface("console").add_console(LUIButton(text = "Log"), interface.get_gui())
 
 def destroy():
-    print("--- Destroying log console")
     global interface
     interface.destroy()
     interface = None
 
 def extend(plugin_name):
-    print("--- log console extends "+plugin_name)
     if plugin_name == 'python_console':
         global log_magic
         log_magic = LogMagic()
 
 def unextend(plugin_name):
-    print("--- log console un-extends "+plugin_name)
     if plugin_name == 'python_console':
         global log_magic
         log_magic._take_magic()
