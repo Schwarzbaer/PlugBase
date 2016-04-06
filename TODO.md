@@ -1,8 +1,6 @@
 Feature of the Week: PluginManager
 ----------------------------------
-* When unloading plugins, implicitly unload (transitively) depending
-  plugins, too.
-* Add functions to analyze the dependency tree.
+* Refactor load/build/extend/unextend/destroy/unload life cycle.
 * Properties that relate to ConfigManager values, i.e.:
     StringProperty(42, "section", "variable", validate=lambda x:True, 
                    change_handler=lambda x: pass)
