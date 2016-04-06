@@ -8,6 +8,8 @@ Feature of the Week: PluginManager
     GenericProperty(<default>, ..., process=lambda x:x)
   where process takes the string coming from the ConfigManager and
   can be turned into any kind of data structure.
+* PluginManager should treat plugin.extends / .extend() / .unextend()
+  as optional.
 
 Small stuff
 -----------
@@ -17,6 +19,7 @@ Small stuff
 * Document PlugBase, especially plugin manager, config manager,
   decorators, helper functions
 * Remove debug prints from code
+* Move %pl* magic into console_plugins code
 
 Towards 1.0
 -----------
