@@ -255,6 +255,12 @@ def get_config_value(section, variable, value_type = str):
 def set_config_value(section, variable, value):
     config_manager.set_value(section, variable, value)
 
+def get_config_variables(section):
+    return config_manager.items(section)
+
+def get_config_sections():
+    return config_manager.sections()
+
 class call_on_change(DirectObject):
     def __init__(self, *args):
         if len(args) == 3 and all([isinstance(arg, str) for arg in args]):
