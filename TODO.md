@@ -13,6 +13,7 @@ Feature of the Week: PluginManager
 
 Small stuff
 -----------
+* "Could not build" needs to output error and trace
 * Implement .destroy() in console, console_log.LogConsole and others
 * console_python.MagicDonor needs a method to undo its transplants
 * Document modules, especially events sent / accepted by plugins

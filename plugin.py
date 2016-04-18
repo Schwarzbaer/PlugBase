@@ -1,9 +1,8 @@
-import weakref
-
 from importlib import import_module#, reload
 from ConfigParser import SafeConfigParser
 from direct.showbase.DirectObject import DirectObject
 import traceback
+from weakref import WeakSet
 
 global config_manager
 
@@ -221,6 +220,8 @@ class ConfigManager(DirectObject):
         else:
             print("No config file to write back to found!")
             self.writeback_file = None
+        
+        self.update_callbacks = {}
         self.accept("change_config_value", self.set)
         self.accept("config_write", self.write)
 
@@ -235,7 +236,10 @@ class ConfigManager(DirectObject):
         return value
 
     def set(self, section, variable, value):
-        self.config.set( section, variable, repr(value))
+        self.config.set(section, variable, repr(value))
+        if (section, variable) in self.update_callbacks:
+            for callback in self.update_callbacks[(section, variable)]:
+                callback(value)
         base.messenger.send("config_value_changed", [section, variable, value])
 
     def write(self):
@@ -248,6 +252,33 @@ class ConfigManager(DirectObject):
 
     def destroy(self):
         self.config.close()
+    
+    def _register_callback(self, section, variable, function):
+        key = (section, variable)
+        if key not in self.update_callbacks:
+            # TODO: After moving to Py3-only, weakref.WeakMethod should
+            # be used here, so as not to keep objects alive when this is
+            # the last reference to it (via the method).
+            self.update_callbacks[key] = set()
+        self.update_callbacks[key].add(function)
+
+class ConfigValue(object):
+    def __init__(self, section, variable, update_callback = None):
+        self.section = section
+        self.variable = variable
+        if update_callback is not None:
+            config_manager._register_callback(section, variable, update_callback)
+
+    def get(self):
+        return config_manager.get(self.section, self.variable)
+
+    def set(self, value):
+        config_manager.set(self.section, self.variable, value)
+
+    # TODO: Implement
+    def __delete__(self, obj):
+        raise NotImplementedError("config_manager lacks removal capability.")
+        # config_manager.remove(self.section, self.variable)
 
 def get_config_value(section, variable, value_type = str):
     return value_type(config_manager.get(section, variable))
@@ -267,7 +298,7 @@ class call_on_change(DirectObject):
             self.patterns = [args]
         else: # FIXME: Check elements!
             self.patterns = args
-        self.objects_to_call = weakref.WeakSet()
+        self.objects_to_call = WeakSet()
         #print(self.section, self.variable, self.method_name)
         self.accept("config_value_changed", self.change_event_filter)
     

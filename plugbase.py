@@ -7,7 +7,6 @@ from panda3d.core import loadPrcFileData
 #from direct.showbase.DirectObject import DirectObject
 
 from plugin import PluginManager
-from core.console_log import INFO
 
 # This will be overwritten by ShowBase and PlugBase. It's just here
 # to suppress Eclipse errors.
@@ -44,6 +43,9 @@ def run(config_file = None):
         app = PlugBase()
     else:
         app = PlugBase(config_file = config_file)
+    # Other imports in that module require the config_manager to
+    # already exist.
+    from core.console_log import INFO
     base.messenger.send("log-event", [INFO, "Application setup complete, starting runloop."])
     app.run()
 
