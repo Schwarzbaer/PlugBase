@@ -151,6 +151,7 @@ class PluginManager:
             else:
                 return False
         except Exception as e:
+            print(e)
             # FIXME: Add original exception
             raise PluginNotBuildable
     

@@ -6,9 +6,10 @@ from panda3d.lui import LUIObject, LUIVerticalLayout, LUIHorizontalLayout
 from LUIScrollableRegion import LUIScrollableRegion
 from LUIButton import LUIButton
 from LUIInputField import LUIInputField
-from LUIFormattedLabel import LUIFormattedLabel
+from LUIFormattedLabel import LUIFormattedLabel, LUILabel
 
-from plugin import get_config_value, set_config_value, get_config_variables, get_config_sections
+from plugin import get_config_value, set_config_value, get_config_variables, get_config_sections,\
+    ConfigValue
 
 dependencies = ['console']
 implements = 'config_console'
@@ -53,7 +54,14 @@ class ConfigConsole(DirectObject):
         self.gui_layout.height = "100%"
         self.gui_layout.set_debug_name("gui_layout")
 
-        self._show()
+        for section in get_config_sections():
+            section_header = LUIFormattedLabel()
+            section_header.set_debug_name("section_header")
+            section_header.add(section, font_size=20, color=(0.2, 0.6, 1.0))
+            self.gui_layout.add(section_header)
+            for var, _ in get_config_variables(section):
+                cell = GUICell(section, var)
+                self.gui_layout.add(cell.root_obj)
 
     def get_gui(self):
         return self.gui_root
@@ -63,27 +71,26 @@ class ConfigConsole(DirectObject):
         pass
 
     def _show(self):
-        for section in get_config_sections():
-            section_header = LUIFormattedLabel()
-            section_header.set_debug_name("section_header")
-            section_header.add(section, font_size=20, color=(0.2, 0.6, 1.0))
-            self.gui_layout.add(section_header)
-            for var, value in get_config_variables(section):
-                
-                var_line = LUIObject()
-                var_line.set_debug_name("var_line")
-                var_line.width = "100%"
-                self.gui_layout.add(var_line)
-                var_layout = LUIHorizontalLayout(parent = var_line)
-                var_layout.width = "100%"
-                
-                var_name = LUIFormattedLabel()
-                var_name.set_debug_name("var_name")
-                var_name.add(var, color=(0.6, 0.6, 0.6))
-                var_layout.add(var_name, "15%")
-                
-                var_value = LUIFormattedLabel()
-                var_value.set_debug_name("var_value")
-                var_value.add(value, color=(0.93, 0.93, 0.93))
-                var_layout.add(var_value, "85%")
         self.gui_root.ls()
+
+class GUICell:
+    def __init__(self, section, variable):
+        value = ConfigValue(section, variable, self.value_updated)
+        self.root_obj = LUIObject()
+        self.root_obj.set_debug_name("var_line")
+        self.root_obj.width = "100%"
+        self.var_layout = LUIHorizontalLayout(parent = self.root_obj)
+        self.var_layout.width = "100%"
+
+        self.var_name = LUIFormattedLabel()
+        self.var_name.set_debug_name("var_name")
+        self.var_name.add(variable, color=(0.6, 0.6, 0.6))
+        self.var_layout.add(self.var_name, "15%")
+        
+        self.var_value = LUILabel()
+        self.var_value.set_debug_name("var_value")
+        self.var_value.set_text(str(value.get()))#, color=(0.93, 0.93, 0.93))
+        self.var_layout.add(self.var_value, "85%")
+
+    def value_updated(self, value):
+        self.var_value.set_text(str(value))

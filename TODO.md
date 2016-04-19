@@ -1,13 +1,5 @@
 Feature of the Week: PluginManager
 ----------------------------------
-* Refactor load/build/extend/unextend/destroy/unload life cycle.
-* Properties that relate to ConfigManager values, i.e.:
-    StringProperty(42, "section", "variable", validate=lambda x:True, 
-                   change_handler=lambda x: pass)
-  Also have:
-    GenericProperty(<default>, ..., process=lambda x:x)
-  where process takes the string coming from the ConfigManager and
-  can be turned into any kind of data structure.
 * PluginManager should treat plugin.extends / .extend() / .unextend()
   as optional.
 
@@ -93,6 +85,11 @@ Towards 1.0
   * (Only) Ship logs to server if explicitly requested to do so
   * Make appearance configurable at runtime
 * Config console
+  * Edit value
+  * Add / remove variable / section
+  * Deal with new config values that pop up at runtime from other
+    places than the console itself.
+    * Have a task that checks every 0.25s?
 * Core functionality
   * @expose_hooks
   * Move plugin.* to plugbase?

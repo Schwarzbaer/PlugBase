@@ -25,16 +25,13 @@ global console # Do I even want this?
 global console_magic
 global interface
 
-
-
-from plugin import ConfigValue
-class Foo(object):
-    def __init__(self):
-        self.a = ConfigValue("console", "text_scale", self.cb)
-
-    def cb(self, value):
-        print("Callback triggered! "+str(value))
-
+#from plugin import ConfigValue
+#class Foo(object):
+#    def __init__(self):
+#        self.a = ConfigValue("console", "text_scale", self.cb)
+#
+#    def cb(self, value):
+#        print("Callback triggered! "+str(value))
 
 
 def build(pm):
@@ -48,8 +45,8 @@ def build(pm):
     global console
     console = Console(interpreter_locals = dict(pm = plugin_manager,
                                                 cm = config_manager,
-                                                f1 = Foo(),
-                                                f2 = Foo(),
+                                                #f1 = Foo(),
+                                                #f2 = Foo(),
                                                 console_command = console_magic))
     plugin_manager.get_interface("console").add_console(LUIButton(text = "Python"), console.gui_window.console_frame)
     global interface
