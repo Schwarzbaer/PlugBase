@@ -85,11 +85,12 @@ Towards 1.0
   * (Only) Ship logs to server if explicitly requested to do so
   * Make appearance configurable at runtime
 * Config console
-  * Edit value
-  * Add / remove variable / section
-  * Deal with new config values that pop up at runtime from other
-    places than the console itself.
-    * Have a task that checks every 0.25s?
+  * Add / remove variable
+  * Add / remove section
+  * Save settings
+  * Show in which files a given variable has been read from
+    * Choose which file a variable should be saved to
+  * Deal with variables / sections that come into existence elsewhere 
 * Core functionality
   * @expose_hooks
   * Move plugin.* to plugbase?
