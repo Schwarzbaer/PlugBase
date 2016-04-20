@@ -6,9 +6,6 @@ Feature of the Week: PluginManager
 Small stuff
 -----------
 * "Could not build" needs to output error and trace
-* Document modules, especially events sent / accepted by plugins
-* Document PlugBase, especially plugin manager, config manager,
-  decorators, helper functions
 * Move %pl* magic into console_plugins code
 
 Towards 1.0
@@ -23,6 +20,9 @@ Towards 1.0
   * Normalize directory structure
   * Remove debug prints from code
 * Implement .destroy() everywhere properly
+* Document PlugBase, especially plugin manager, config manager,
+  decorators, helper functions
+* Document modules, especially events sent / accepted by plugins
 
 ### Core
 * Core functionality
@@ -98,6 +98,11 @@ Towards 1.0
   * Deal with variables / sections that come into existence elsewhere 
 * Debug console
   Just a frontend for debug tools?
+* Plugins console
+  * Visualization of known plugins
+  * Dependency DAG of loaded plugins
+  * Show extension relations
+  * Interactive load / build / destroy / unload / reload
 
 ### Other plugins
 * keybindings
