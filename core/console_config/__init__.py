@@ -57,13 +57,7 @@ class ConfigConsole(DirectObject):
         self.gui_layout.set_debug_name("gui_layout")
 
         for section in get_config_sections():
-            section_header = LUIFormattedLabel()
-            section_header.set_debug_name("section_header")
-            section_header.add(section, font_size=20, color=(0.2, 0.6, 1.0))
-            self.gui_layout.add(section_header)
-            for var, _ in get_config_variables(section):
-                cell = GUICell(section, var)
-                self.gui_layout.add(cell.root_obj)
+            section_cell = GUISectionCell(section, self.gui_layout)
 
     def get_gui(self):
         return self.gui_root
@@ -75,8 +69,25 @@ class ConfigConsole(DirectObject):
     def _show(self):
         self.gui_root.ls()
 
-class GUICell:
+
+class GUISectionCell:
+    def __init__(self, section, layout):
+        header_color = ConfigValue("console_config", "color_section", self.update_header_color)
+        self.section_header = LUILabel(text=section, font_size=20, color=header_color.get())
+        self.section_header.set_debug_name("section_header")
+        layout.add(self.section_header)
+        for var, _ in get_config_variables(section):
+            cell = GUIVariableCell(section, var)
+            layout.add(cell.root_obj)
+    
+    def update_header_color(self, value):
+        self.section_header.color = value
+
+
+class GUIVariableCell:
     def __init__(self, section, variable):
+        self.color_variable = ConfigValue("console_config", "color_variable", self.change_var_name_color)
+        self.color_value = ConfigValue("console_config", "color_value", self.change_var_value_color)
         self.mode = 0 # 0 for display, 1 for entry
         self.value = ConfigValue(section, variable, self.value_updated)
         self.root_obj = LUIObject()
@@ -87,13 +98,13 @@ class GUICell:
 
         self.var_name = LUIFormattedLabel()
         self.var_name.set_debug_name("var_name")
-        self.var_name.add(variable, color=(0.6, 0.6, 0.6))
+        self.var_name.add(variable, color=self.color_variable.get())
         self.var_layout.add(self.var_name, "15%")
         
         self.var_value = LUILabel()
         #self.var_value = LUIFormattedLabel()
         self.var_value.set_debug_name("var_value")
-        self.var_value.set_text(str(self.value.get()))
+        self.var_value.set_text(repr(self.value.get()))
         #self.var_value.add(str(self.value.get()), color=(0.93, 0.93, 0.93))
         self.var_value.solid = True
         self.var_value.bind("click", self.toggle_mode)
@@ -101,7 +112,8 @@ class GUICell:
         
         self.var_value_entry = LUIInputField()
         self.var_value_entry.set_debug_name("var_value_input")
-        self.var_value_entry.set_value(self.value.get())
+        self.var_value_entry.margin = (-6, 0, 0, -6)
+        self.var_value_entry.set_value(repr(self.value.get()))
         self.var_value_entry.bind("enter", self.enter_new_value)
         self.var_layout.add(self.var_value_entry)#, "85%")
         
@@ -116,6 +128,7 @@ class GUICell:
             self.var_value.hide()
             self.var_value.parent.width = 0
             self.var_value_entry.show()
+            self.var_value_entry.request_focus()
         else:
             self.mode = 0
             self.var_value.show()
@@ -123,9 +136,16 @@ class GUICell:
             self.var_value_entry.hide()
 
     def enter_new_value(self, event):
-        self.value.set(self.var_value_entry.get_value())
+        value = eval(self.var_value_entry.get_value())
+        self.value.set(value)
         self.toggle_display()
 
     def value_updated(self, value):
-        self.var_value.set_text(str(value))
-        self.var_value_entry.set_value(value)
+        self.var_value.set_text(repr(value))
+        self.var_value_entry.set_value(repr(value))
+
+    def change_var_name_color(self, value):
+        self.var_name.color = value
+
+    def change_var_value_color(self, value):
+        self.var_value.color = value

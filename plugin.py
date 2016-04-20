@@ -281,8 +281,8 @@ class ConfigValue(object):
         raise NotImplementedError("config_manager lacks removal capability.")
         # config_manager.remove(self.section, self.variable)
 
-def get_config_value(section, variable, value_type = str):
-    return value_type(config_manager.get(section, variable))
+def get_config_value(section, variable):
+    return config_manager.get(section, variable)
 
 def set_config_value(section, variable, value):
     config_manager.set_value(section, variable, value)
