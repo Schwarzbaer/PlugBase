@@ -16,38 +16,54 @@ Small stuff
 
 Towards 1.0
 -----------
+### Meta
+* Code hygiene
+  * optionalize DirectObject in plugin.py
+  * add logging
+  * insure Py2 / Py3 compliance
+  * run() deadlocks browser, so when there's a replacement idiom,
+    use that one.
+  * Normalize directory structure
+### Core
+* Core functionality
+  * @expose_hooks
+  * Move plugin.* to plugbase?
+  * can_use plugin var for deferred build()?
+* config_manager
+  * @call_on_change should closely check its args.
+  * ConfigManager should be a derived class of ConfigParser
+  * Check plugin default configs for unspecified values
+    (ConfigParser.NoOptionError)
+  * Proper exceptions when not finding values
+  * Try not to use Panda3D's events
+### Consoles
+* Every console
+  * Improve docstrings.
+  * Pull appearance vars from config_manager
 * console
   * Interpreter %magic
-    * Improve docstrings.
     * Improve docstring format, so that there's no more whitespaces
       an the beginning of lines.
     * Harden %magic commands against wrong commands and similar
       erroneous input.
-  * Pull appearance vars from config_manager
-  * Integrate pyperclip, checking for import exception.
-  * "Save selected fields to file"
-    * File selection dialogue
-    * Flushing items to file
   * Improvements depending on improvements to LUI
     * Unset focus on input when console hides
     * Implement editing keystrokes (copy, paste, ...)
-    * history
-      * Track the bottom
-      * Should be scrollable by mousewheel
-      * Copy to input field / cursor-up for past command
-    * Additional tabs
-      * Composing and sending events, adding listeners to
-        DirectObjects; base.messenger._getEvents()
-      * Managing tasks; base.taskMgr.getTasks()
-      * Full list of DirectObjects? (look into Messenger.py for how
-        to get a list)
-      * List of registered events, and verbose output of events going
-        through the systen.
-      * Lists of, and players for, media assets
-        * Integrate the .bam streamer, maybe as its own plugin.
-      * List of code snippets (to hook into tasks and events).
-      * List and exemplars of objects in pools.
-        * Create inspection interfaces, i.e. for ModelPool
+* Task / Event console
+  * Composing and sending events
+  * adding listeners to DirectObjects; base.messenger._getEvents()
+  * Managing tasks; base.taskMgr.getTasks()
+  * Full list of DirectObjects? (look into Messenger.py for how
+    to get a list)
+  * List of registered events, and verbose output of events going
+    through the systen.
+  * List of code snippets (to hook into tasks and events).
+* Assets console
+  * Lists of, and players for, media assets
+    * Integrate the .bam streamer, maybe as its own plugin.
+  * List and exemplars of objects in pools.
+  * Create inspection interfaces, i.e. for ModelPool
+* Python console
   * Interpreter: Input
     * If an input was incomplete, caused a syntax error or
       traceback, it should not be written to history, and the input
@@ -58,26 +74,14 @@ Towards 1.0
   * integrate jedi
     * Can I get auto-indentation?
   * A keystroke should focus (and add itself to) the entry box.
-* config_manager
-  * @call_on_change should closely check its args.
-  * Use eval() to give each config value an explicit type.
-  * ConfigManager should be a derived class of ConfigParser
-  * Check plugin default configs for unspecified values
-    (ConfigParser.NoOptionError)
-  * Proper exceptions when not finding values
-  * Try not to use Panda3D's events
-* keybindings
-  * Well, actually implement this.
-  * Optional menu
-* debug tools
-  * render.explore()
-  * light.showFrustum()
-  * NP.showBounds()
-  * The equivalent for colliders and physics bodies
-  * Tool for temporarily taking over the camera
-    * Create a camera that colocates with the currently chosen
-      camera, takes over its DisplayBuffer, can be controlled
-      manually, and at the end restores the original state.
+  * Integrate pyperclip, checking for import exception.
+  * "Save selected fields to file"
+    * File selection dialogue
+    * Flushing items to file
+  * history
+    * Track the bottom
+    * Should be scrollable by mousewheel
+    * Copy to input field / cursor-up for past command
 * Logging console
   * Use for regular logging and for debugging / profiling information
   * Write to graphical window, stdout/stderr and/or file
@@ -91,13 +95,23 @@ Towards 1.0
   * Show in which files a given variable has been read from
     * Choose which file a variable should be saved to
   * Deal with variables / sections that come into existence elsewhere 
-* Core functionality
-  * @expose_hooks
-  * Move plugin.* to plugbase?
-  * can_use plugin var for deferred build()?
+* Debug console
+  Just a frontend for debug tools?
+### Other plugins
+* keybindings
+  * Input bindings, mappings and contexts
+  * Optional menu
+* debug tools
+  * render.explore()
+  * light.showFrustum()
+  * NP.showBounds()
+  * The equivalent for colliders and physics bodies
+  * Tool for temporarily taking over the camera
+    * Create a camera that colocates with the currently chosen
+      camera, takes over its DisplayBuffer, can be controlled
+      manually, and at the end restores the original state.
 * Capabilities checking
   * See GSG and GraphicsPipe API.
-* Input bindings, mappings and contexts
 * Game element flow
 * Graphics packages
 * Jailed Python Interpreter for game objects
@@ -118,13 +132,6 @@ Towards 1.0
   * Drawing board, text storage
   * VoIP
   * Twitch integration
-* Code hygiene
-  * optionalize DirectObject in plugin.py
-  * add logging
-  * insure Py2 / Py3 compliance
-  * run() deadlocks browser, so when there's a replacement idiom,
-    use that one.
-  * Normalize directory structure
 
 Beyond 1.0
 ----------
