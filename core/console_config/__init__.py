@@ -6,7 +6,9 @@ from panda3d.lui import LUIObject, LUIVerticalLayout, LUIHorizontalLayout
 from LUIScrollableRegion import LUIScrollableRegion
 from LUIButton import LUIButton
 from LUIInputField import LUIInputField
-from LUIFormattedLabel import LUIFormattedLabel, LUILabel
+from LUIFormattedLabel import LUIFormattedLabel
+from LUILabel import LUILabel
+from LUIInputField import LUIInputField
 
 from plugin import get_config_value, set_config_value, get_config_variables, get_config_sections,\
     ConfigValue
@@ -75,7 +77,8 @@ class ConfigConsole(DirectObject):
 
 class GUICell:
     def __init__(self, section, variable):
-        value = ConfigValue(section, variable, self.value_updated)
+        self.mode = 0 # 0 for display, 1 for entry
+        self.value = ConfigValue(section, variable, self.value_updated)
         self.root_obj = LUIObject()
         self.root_obj.set_debug_name("var_line")
         self.root_obj.width = "100%"
@@ -88,9 +91,41 @@ class GUICell:
         self.var_layout.add(self.var_name, "15%")
         
         self.var_value = LUILabel()
+        #self.var_value = LUIFormattedLabel()
         self.var_value.set_debug_name("var_value")
-        self.var_value.set_text(str(value.get()))#, color=(0.93, 0.93, 0.93))
-        self.var_layout.add(self.var_value, "85%")
+        self.var_value.set_text(str(self.value.get()))
+        #self.var_value.add(str(self.value.get()), color=(0.93, 0.93, 0.93))
+        self.var_value.solid = True
+        self.var_value.bind("click", self.toggle_mode)
+        self.var_layout.add(self.var_value)#, "85%")
+        
+        self.var_value_entry = LUIInputField()
+        self.var_value_entry.set_debug_name("var_value_input")
+        self.var_value_entry.set_value(self.value.get())
+        self.var_value_entry.bind("enter", self.enter_new_value)
+        self.var_layout.add(self.var_value_entry)#, "85%")
+        
+        self.var_value_entry.hide()
+
+    def toggle_mode(self, event):
+        self.toggle_display()
+    
+    def toggle_display(self):
+        if self.mode == 0:
+            self.mode = 1
+            self.var_value.hide()
+            self.var_value.parent.width = 0
+            self.var_value_entry.show()
+        else:
+            self.mode = 0
+            self.var_value.show()
+            #self.var_value.parent.width = "85%"
+            self.var_value_entry.hide()
+
+    def enter_new_value(self, event):
+        self.value.set(self.var_value_entry.get_value())
+        self.toggle_display()
 
     def value_updated(self, value):
         self.var_value.set_text(str(value))
+        self.var_value_entry.set_value(value)
