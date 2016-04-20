@@ -6,24 +6,24 @@ Feature of the Week: PluginManager
 Small stuff
 -----------
 * "Could not build" needs to output error and trace
-* Implement .destroy() in console, console_log.LogConsole and others
-* console_python.MagicDonor needs a method to undo its transplants
 * Document modules, especially events sent / accepted by plugins
 * Document PlugBase, especially plugin manager, config manager,
   decorators, helper functions
-* Remove debug prints from code
 * Move %pl* magic into console_plugins code
 
 Towards 1.0
 -----------
+
 ### Meta
 * Code hygiene
   * optionalize DirectObject in plugin.py
-  * add logging
   * insure Py2 / Py3 compliance
   * run() deadlocks browser, so when there's a replacement idiom,
     use that one.
   * Normalize directory structure
+  * Remove debug prints from code
+* Implement .destroy() everywhere properly
+
 ### Core
 * Core functionality
   * @expose_hooks
@@ -36,6 +36,7 @@ Towards 1.0
     (ConfigParser.NoOptionError)
   * Proper exceptions when not finding values
   * Try not to use Panda3D's events
+
 ### Consoles
 * Every console
   * Improve docstrings.
@@ -97,6 +98,7 @@ Towards 1.0
   * Deal with variables / sections that come into existence elsewhere 
 * Debug console
   Just a frontend for debug tools?
+
 ### Other plugins
 * keybindings
   * Input bindings, mappings and contexts
