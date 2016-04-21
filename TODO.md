@@ -1,8 +1,3 @@
-Feature of the Week: PluginManager
-----------------------------------
-* PluginManager should treat plugin.extends / .extend() / .unextend()
-  as optional.
-
 Small stuff
 -----------
 * "Could not build" needs to output error and trace
@@ -23,12 +18,12 @@ Towards 1.0
 * Document PlugBase, especially plugin manager, config manager,
   decorators, helper functions
 * Document modules, especially events sent / accepted by plugins
+* Give the whole code a close read and a good polish
 
 ### Core
 * Core functionality
   * @expose_hooks
   * Move plugin.* to plugbase?
-  * can_use plugin var for deferred build()?
 * config_manager
   * @call_on_change should closely check its args.
   * ConfigManager should be a derived class of ConfigParser

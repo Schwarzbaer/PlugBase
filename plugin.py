@@ -38,16 +38,16 @@ class PluginManager:
         return extenders
     
     def _get_extendees(self, plugin_name):
-        assert plugin_name in self.extenders.keys(), "Extender not registered"
+        assert plugin_name in self.extenders, "".join(["Extender ", plugin_name, " not registered"])
         all_extendees = self.extenders[plugin_name]
         return [extendee for extendee in all_extendees if extendee in self.active_plugins]
     
     def _add_extender(self, extender, extendees):
-        assert extender not in self.extenders.keys(), "Extender already registered"
+        assert extender not in self.extenders, "Extender already registered"
         self.extenders[extender] = set(extendees)
     
     def _remove_extender(self, extender):
-        assert extender in self.extenders.keys(), "Extender not registered"
+        assert extender in self.extenders, "Extender not registered"
         del self.extenders[extender]
     
     def _get_dependants(self, root_plugin_name, only_actives=True):
@@ -83,7 +83,7 @@ class PluginManager:
     def load_plugin(self, plugin_name):
         """Load a plugin.
         Throws PluginNotLoadable if the plugin can't be imported"""
-        assert plugin_name not in self.plugins.keys(), "Plugin already loaded"
+        assert plugin_name not in self.plugins, "Plugin already loaded"
         directory = config_manager.get("plugin_dirs", plugin_name)
         try:
             plugin = import_module(directory)
@@ -107,7 +107,7 @@ class PluginManager:
         return loaded_plugins, unloadable_plugins
     
     def unload_plugin(self, plugin_name, implicit_destroy=True, unload_dependants=True):
-        if plugin_name not in self.plugins.keys():
+        if plugin_name not in self.plugins:
             raise PluginNotLoaded()
         if not implicit_destroy:
             assert plugin_name not in self.active_plugins, "Plugin is still active"
@@ -125,7 +125,7 @@ class PluginManager:
         del self.plugins[plugin_name]
     
     def reload_plugin(self, plugin_name):
-        if plugin_name in self.plugins.keys():
+        if plugin_name in self.plugins:
             self.plugins[plugin_name].destroy()
             self.plugins[plugin_name] = reload(self.plugins[plugin_name])
             self.build_plugin(plugin_name)
@@ -135,14 +135,18 @@ class PluginManager:
     # Building and destroying
 
     def build_plugin(self, plugin_name):
-        if plugin_name not in self.plugins.keys():
+        if plugin_name not in self.plugins:
             raise PluginNotLoaded
         try:
             deps = self.plugins[plugin_name].dependencies
             if all([d in self.active_plugins for d in deps]):
                 self.plugins[plugin_name].build(self)
                 self.active_plugins.append(plugin_name)
-                self._add_extender(plugin_name, self.plugins[plugin_name].extends)
+                if hasattr(self.plugins[plugin_name], "extends"):
+                    extendees = self.plugins[plugin_name].extends
+                else:
+                    extendees = []
+                self._add_extender(plugin_name, extendees)
                 for extender in self._get_extenders(plugin_name):
                     self.plugins[extender].extend(plugin_name)
                 for extendee in self._get_extendees(plugin_name):
@@ -339,7 +343,7 @@ class configargs(object):
         global config_manager
         def inner_func(*args, **kwargs):
             for key in self.default_kwargs.keys():
-                if key not in kwargs.keys():
+                if key not in kwargs:
                     variable_description = self.default_kwargs[key]
                     if len(variable_description) == 2:
                         kwargs[key] = config_manager.get(*variable_description)
