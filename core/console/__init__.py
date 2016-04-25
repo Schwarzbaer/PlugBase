@@ -59,4 +59,7 @@ class ConsoleFrame(DirectObject):
         self.frame.set_visible(self.visible)
 
     def add_console(self, button, window):
-        self.frame.add(button, window)
+        return self.frame.add(button, window)
+
+    def remove_console(self, button):
+        self.frame.remove(button)

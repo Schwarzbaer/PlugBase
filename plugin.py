@@ -13,7 +13,10 @@ class PluginNotLoadable(Exception):
     pass
 
 class PluginNotBuildable(Exception):
-    pass
+    def __init__(self):
+        self.reason = traceback.format_exc()
+    def __str__(self, *args, **kwargs):
+        return self.reason
 
 class PluginNotLoaded(Exception):
     pass
@@ -42,9 +45,13 @@ class PluginManager:
         all_extendees = self.extenders[plugin_name]
         return [extendee for extendee in all_extendees if extendee in self.active_plugins]
     
-    def _add_extender(self, extender, extendees):
-        assert extender not in self.extenders, "Extender already registered"
-        self.extenders[extender] = set(extendees)
+    def _add_extender(self, plugin_name):
+        assert plugin_name not in self.extenders, "Extender already registered"
+        if hasattr(self.plugins[plugin_name], "extends"):
+            extendees = self.plugins[plugin_name].extends
+        else:
+            extendees = []
+        self.extenders[plugin_name] = set(extendees)
     
     def _remove_extender(self, extender):
         assert extender in self.extenders, "Extender not registered"
@@ -91,6 +98,7 @@ class PluginManager:
             # TODO: Embed actual exception and stacktrace
             raise PluginNotLoadable()
         self.plugins[plugin_name] = plugin
+        self._add_extender(plugin_name)
     
     def load_plugins(self, plugin_list):
         loaded_plugins = []
@@ -123,6 +131,7 @@ class PluginManager:
             for dep in deps:
                 self.unload_plugin(dep, unload_dependants=False)
         del self.plugins[plugin_name]
+        self._remove_extender(plugin_name)
     
     def reload_plugin(self, plugin_name):
         if plugin_name in self.plugins:
@@ -138,15 +147,13 @@ class PluginManager:
         if plugin_name not in self.plugins:
             raise PluginNotLoaded
         try:
-            deps = self.plugins[plugin_name].dependencies
+            if hasattr(self.plugins[plugin_name], "dependencies"):
+                deps = self.plugins[plugin_name].dependencies
+            else:
+                deps = []
             if all([d in self.active_plugins for d in deps]):
                 self.plugins[plugin_name].build(self)
                 self.active_plugins.append(plugin_name)
-                if hasattr(self.plugins[plugin_name], "extends"):
-                    extendees = self.plugins[plugin_name].extends
-                else:
-                    extendees = []
-                self._add_extender(plugin_name, extendees)
                 for extender in self._get_extenders(plugin_name):
                     self.plugins[extender].extend(plugin_name)
                 for extendee in self._get_extendees(plugin_name):
@@ -155,9 +162,9 @@ class PluginManager:
             else:
                 return False
         except Exception as e:
-            print(e)
+            # print(e)
             # FIXME: Add original exception
-            raise PluginNotBuildable
+            raise PluginNotBuildable()
     
     def build_plugins(self, plugin_list):
         built_plugins = []
@@ -174,7 +181,12 @@ class PluginManager:
                         built_plugins.append(plugin_name)
                         del left_to_build[idx]
                         break
-                except PluginNotBuildable, PluginNotLoaded:
+                except PluginNotBuildable as e:
+                    print(e)
+                    unbuildable_plugins.append(plugin_name)
+                    del left_to_build[idx]
+                    break
+                except PluginNotLoaded:
                     unbuildable_plugins.append(plugin_name)
                     del left_to_build[idx]
                     break
@@ -183,8 +195,8 @@ class PluginManager:
         return built_plugins, left_to_build + unbuildable_plugins
     
     def destroy_plugin(self, plugin_name):
-        deps = self._get_dependants(plugin_name, only_actives=True)
         # TODO: Also destroy plugins that depend on this one
+        # deps = self._get_dependants(plugin_name, only_actives=True)
         if plugin_name not in self.active_plugins:
             raise PluginNotBuilt
         for extendee in self._get_extendees(plugin_name):

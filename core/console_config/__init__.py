@@ -16,29 +16,27 @@ from plugin import get_config_value, set_config_value, get_config_variables, get
 dependencies = ['console']
 implements = 'config_console'
 # extends = ['python_console']
-extends = []
 
 global base
 global plugin_manager
 global interface
+global tab_ref
 
 def build(pm):
     global plugin_manager
     plugin_manager = pm
     global interface
     interface = ConfigConsole()
-    plugin_manager.get_interface("console").add_console(LUIButton(text = "Config"), interface.get_gui())
+    global tab_ref
+    tab_ref = plugin_manager.get_interface("console").add_console(LUIButton(text = "Config"), interface.get_gui())
 
 def destroy():
+    global tab_ref
+    plugin_manager.get_interface("console").remove_console(tab_ref)
+    tab_ref = None
     global interface
     interface.destroy()
     interface = None
-
-def extend(plugin_name):
-    pass
-
-def unextend(plugin_name):
-    pass
 
 class ConfigConsole(DirectObject):
     def __init__(self):
