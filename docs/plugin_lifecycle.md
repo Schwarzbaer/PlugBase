@@ -1,3 +1,21 @@
+Plugin API
+----------
+
+A plugin is a module that
+* must have an 'implements' attribute, which is a string
+* may have a 'dependencies' attribute, which is a list of strings
+* may have an 'extends' attribute, which is a list of strings
+  * must then have an .extend() function, which takes a plugin name
+    as argument
+  * must then have an .unextend() function, which takes a plugin name
+    as argument
+* must have a .build() function, which takes a PluginManager instance
+  as argument
+* must have a .destroy() function, which takes no arguments
+
+Plugin Life Cycle
+-----------------
+
 The plugin lifecycle consists of four stages.
 
 load_plugin
