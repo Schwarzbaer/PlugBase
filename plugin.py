@@ -33,17 +33,20 @@ class PluginManager:
         config_manager = ConfigManager(config_files)
         self.startup()
     
-    def _get_extenders(self, extendee):
+    def _get_extenders(self, extendee, only_actives=True):
         extenders = []
         for extender, extendees in self.extenders.iteritems():
             if extendee in extendees:
-                extenders.append(extender)
+                if (extendee in self.active_plugins) or (not only_actives):
+                    extenders.append(extender)
         return extenders
     
-    def _get_extendees(self, plugin_name):
+    def _get_extendees(self, plugin_name, only_actives=True):
         assert plugin_name in self.extenders, "".join(["Extender ", plugin_name, " not registered"])
         all_extendees = self.extenders[plugin_name]
-        return [extendee for extendee in all_extendees if extendee in self.active_plugins]
+        return [extendee
+                for extendee in all_extendees
+                if ((extendee in self.active_plugins) or (not only_actives))]
     
     def _add_extender(self, plugin_name):
         assert plugin_name not in self.extenders, "Extender already registered"
@@ -154,9 +157,9 @@ class PluginManager:
             if all([d in self.active_plugins for d in deps]):
                 self.plugins[plugin_name].build(self)
                 self.active_plugins.append(plugin_name)
-                for extender in self._get_extenders(plugin_name):
+                for extender in self._get_extenders(plugin_name, only_actives=True):
                     self.plugins[extender].extend(plugin_name)
-                for extendee in self._get_extendees(plugin_name):
+                for extendee in self._get_extendees(plugin_name, only_actives=True):
                     self.plugins[plugin_name].extend(extendee)
                 return True
             else:

@@ -1,6 +1,5 @@
 Small stuff
 -----------
-* "Could not build" needs to output error and trace
 * Move %pl* magic into console_plugins code
 * Make PluginManager.active_plugins a set
 
@@ -94,6 +93,14 @@ Towards 1.0
   * Deal with variables / sections that come into existence elsewhere 
 * Debug console
   Just a frontend for debug tools?
+  * fps
+  * render.analyze
+  * render.ls
+  * physics bounding volumes
+  * colliders
+  * bounding volumes
+  * other .show()s
+  * ShowBase.movie
 * Plugins console
   * Visualization of known plugins
   * Dependency DAG of loaded plugins
