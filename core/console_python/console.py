@@ -117,13 +117,12 @@ class ConsoleGUI:
         self.command_line.bind("control-k", self.kill_to_end)
         self.command_line.bind("control-l", self.kill_line)
 
-    def set_visible(self, state):
-        if state:
-            self.console_frame.show()
-            self.command_line.request_focus()
-        else:
-            self.console_frame.hide()
-            # FIXME: Un-focus
+        self.console_frame.bind("expose", self.on_expose)
+        #self.console_frame.bind("unexposed", self.exposed)
+
+    def on_expose(self, event):
+        self.command_line.request_focus()
+
         
     def write(self, text, color = "font_color_entry"):
         self.history_objects.append(ConsoleHistoryItem(self.history,
@@ -259,7 +258,6 @@ class Console(DirectObject, BufferingInterpreter):
         BufferingInterpreter.__init__(self, lambda mode, data: self.gui_window.write(data, mode), locals = interpreter_locals)
         self.window = base.win
         self.visible = False
-        self.gui_window.set_visible(self.visible)
 
         self.fake_io = FakeIO()
         self.color_stack = False

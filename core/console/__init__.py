@@ -1,6 +1,5 @@
 dependencies = ["keybindings"]
 implements = "console"
-extends = []
 
 from direct.showbase.DirectObject import DirectObject
 from panda3d.lui import LUIRegion, LUIInputHandler
@@ -53,9 +52,11 @@ class ConsoleFrame(DirectObject):
         if self.visible:
             # Hide Console
             self.visible = False
+            self.frame.trigger_event("unexpose")
         else:
             # Show console
             self.visible = True
+            self.frame.trigger_event("expose")
         self.frame.set_visible(self.visible)
 
     def add_console(self, button, window):
