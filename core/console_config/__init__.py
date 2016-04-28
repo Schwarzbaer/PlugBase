@@ -15,7 +15,6 @@ from plugin import get_config_value, set_config_value, get_config_variables, get
 
 dependencies = ['console']
 implements = 'config_console'
-# extends = ['python_console']
 
 global base
 global plugin_manager

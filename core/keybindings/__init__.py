@@ -1,6 +1,4 @@
-dependencies = []
 implements = "keybindings"
-extends = []
 
 from direct.showbase.DirectObject import DirectObject
 import sys
