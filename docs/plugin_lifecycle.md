@@ -13,6 +13,22 @@ A plugin is a module that
   as argument
 * must have a .destroy() function, which takes no arguments
 
+Referencing a Plugin in Configuration
+-------------------------------------
+
+* The plugin's implement string defines what kind of interface the
+  plugin implements. This is the interface name.
+* The actual implementation can also have an individual name, to
+  disambiguate several plugins that implement the same interface.
+  This is the plugin name.
+* The game's (or the framework's) configuration file should, in the
+  section plugin_dirs, associate the plugin name with a string that
+  contains the plugin's location in Python module path notation.
+* The config may (and the framework's config does) have a section
+  plugins with a variable build_on_startup, which contains a string
+  that is a comma-separated list of plugin names, all of which will
+  be attempted to be loaded and built on startup.
+
 Plugin Life Cycle
 -----------------
 
@@ -37,8 +53,9 @@ unload_plugin
 * plugin is now not loaded
 
 
+Plugin Manager
+--------------
 
-Helper functions
 * load_plugins
 * build_plugins
 * reload_plugin

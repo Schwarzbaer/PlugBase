@@ -24,6 +24,11 @@ Towards 1.0
 * Core functionality
   * @expose_hooks
   * Move plugin.* to plugbase?
+* PluginManager
+  * Refactor
+    * Distinguish between plugin name and interface name
+      * Multiple plugins for the same interface may be loaded, but
+        only one of them can be active
 * config_manager
   * @call_on_change should closely check its args.
   * ConfigManager should be a derived class of ConfigParser

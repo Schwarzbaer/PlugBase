@@ -122,7 +122,6 @@ class ConsoleGUI:
 
     def on_expose(self, event):
         self.command_line.request_focus()
-
         
     def write(self, text, color = "font_color_entry"):
         self.history_objects.append(ConsoleHistoryItem(self.history,
