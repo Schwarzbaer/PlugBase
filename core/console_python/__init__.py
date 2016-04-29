@@ -11,7 +11,6 @@ Interface:
 
 dependencies = ["console"]
 implements = "python_console"
-extends = []
 
 from LUILabel import LUILabel
 from LUIButton import LUIButton
