@@ -10,21 +10,11 @@ from LUIScrollableRegion import LUIScrollableRegion
 from LUIInputField import LUIInputField
 from LUIFormattedLabel import LUIFormattedLabel
 
-from plugin import configargs, get_config_value#, call_on_change
+from plugin import configargs, get_config_value, ConfigValue#, call_on_change
 
 global base # This is just to suppress Eclipse error indicators
 
 TEXT_MARGIN = (0.03, -0.06)
-colors = {"font_color_banner": (1.0, 1.0, 0.0),
-          "font_color_entry": (1.0, 1.0, 1.0),
-          "font_color_entered": (0.8, 0.8, 0.8),
-          "font_color_write": (0.0, 1.0, 0.0),
-          "font_color_syntaxerror": (1.0, 0.0, 0.0),
-          "font_color_traceback": (0.8, 0.0, 0.0),
-          "font_color_stdout": (0.5, 0.5, 0.5),
-          "font_color_stderr": (0.5, 0.0, 0.0),
-          "font_color_weird": (1.0, 0.0, 1.0),
-          "font_color_selected_history_item": (1.0, 1.0, 1.0)}
 
 # Create and hide a Tk window, so that we can access the cut buffer
 try:
@@ -79,13 +69,12 @@ class FakeIO:
 #     |     + ...
 #     + InputField               # command_line
 
-class ConsoleGUI:
+class ConsoleGUI(LUIObject):
     def __init__(self, interpreter):
-        self.interpreter = interpreter
+        super(ConsoleGUI, self).__init__()
         self.history_objects = []
         
-        self.console_frame = LUIObject()
-        console = LUIVerticalLayout(parent = self.console_frame, spacing = 3)
+        console = LUIVerticalLayout(parent = self, spacing = 3)
         #console.use_dividers = True
         console.width = "100%"
         console.height = "100%"
@@ -100,39 +89,86 @@ class ConsoleGUI:
         self.history = LUIVerticalLayout(parent = self.history_region.content_node,
                                          spacing = 2)
         self.history.width = "100%"
-        #self.history.height = "100%"
         self.history.margin = 0
 
-        self.command_line = LUIInputField()
+        self.command_line = ConsoleInput(interpreter)
         self.command_line.width = "100%"
-        #self.command_line.height = "10%"
         console.add(self.command_line, "?")
         
-        self.command_line.bind("tab", self.tab)
-        self.command_line.bind("enter", self.enter)
-        self.command_line.bind("control-c", self.copy)
-        self.command_line.bind("control-v", self.paste)
-        self.command_line.bind("control-x", self.cut)
-        self.command_line.bind("control-u", self.kill_to_start)
-        self.command_line.bind("control-k", self.kill_to_end)
-        self.command_line.bind("control-l", self.kill_line)
-
-        self.console_frame.bind("expose", self.on_expose)
-        #self.console_frame.bind("unexposed", self.exposed)
-
     def on_expose(self, event):
         self.command_line.request_focus()
         
-    def write(self, text, color = "font_color_entry"):
+    def write(self, text, color = "color_entry"):
         self.history_objects.append(ConsoleHistoryItem(self.history,
                                                        text,
                                                        color = color))
         self.history_region.scroll_to_bottom()
+    
+    def destroy(self):
+        self.parent = None
+
+
+class ConsoleHistoryItem:
+    def __init__(self, history, text, color = "color_entry"):
+        self.color_basic = ConfigValue("console_python", color, self._recolor_basic)
+        self.color_highlight = ConfigValue("console_python", "color_selected_history_item")
+        self.history_entry = LUIFormattedLabel()
+        self.history_entry.margin = (0, 0, 0, 0)
+        #self.history_entry.height = "100%"
+        #self.history_entry.width = "100%"
+        history.add(self.history_entry, "?")
+        self.history_entry.solid = True
+        self.history_entry.bind("click", self.click)
+
+        # FIXME: Choose color based on text_type
+        for text_part in text.split("\n"):
+            if text_part == "":
+                self.history_entry.newline()
+            else:
+                self.history_entry.add(text_part, font_size = 15, color = self.color_basic.get())
+                self.history_entry.newline()
+        
+        self.text = text
+        self.selected = False
+    
+    def _recolor_basic(self, color):
+        if not self.selected:
+            self.history_entry.color = color
+    
+    def _recolor_highlight(self, color):
+        if not self.selected:
+            self.history_entry.color = color
+    
+    def click(self, lui_event):
+        self.selected = not self.selected
+        if self.selected:
+            self.history_entry.color = self.color_highlight.get()
+        else:
+            self.history_entry.color = self.color_basic.get()
+
+
+class ConsoleInput(LUIInputField, DirectObject):
+    def __init__(self, interpreter):
+        self.interpreter = interpreter
+        super(ConsoleInput, self).__init__()
+        self.bind("tab", self.tab)
+        self.bind("enter", self.enter)
+        self.bind("control-c", self.copy)
+        self.bind("control-v", self.paste)
+        self.bind("control-x", self.cut)
+        self.bind("control-u", self.kill_to_start)
+        self.bind("control-k", self.kill_to_end)
+        self.bind("control-l", self.kill_line)
+        # TODO: Delete this debug bind
+        self.accept("set_cursor_pos", self.cp)
+    def cp(self, cursor_pos):
+        self.cursor_pos = cursor_pos
+        self._render_text()
 
     def enter(self, event):
-        should_continue = self.interpreter.command(self.command_line.get_value()+"\n")
+        should_continue = self.interpreter.command(self.get_value()+"\n")
         if not should_continue:
-            self.command_line.set_value("")
+            self.set_value("")
 
     def tab(self, event):
         # FIXME: Implement
@@ -144,14 +180,14 @@ class ConsoleGUI:
         tk_window = tk.Tk()
         tk_window.withdraw()
         tk_window.clipboard_clear()
-        tk_window.clipboard_append(self.command_line.get_value())
-        print(tk_window, self.command_line.get_value(), tk_window.clipboard_get())
+        tk_window.clipboard_append(self.get_value())
+        print(tk_window, self.get_value(), tk_window.clipboard_get())
         tk_window.destroy()
 
     def cut(self, event):
         # FIXME: If text is selected, limit to that.
         self.copy(event)
-        self.command_line.set_value("")
+        self.set_value("")
 
     def paste(self, event):
         # FIXME: Add text at cursor position.
@@ -171,43 +207,6 @@ class ConsoleGUI:
     def kill_line(self):
         # FIXME: Implement
         print("kill_line")
-
-class ConsoleHistoryItem:
-    def __init__(self, history, text, color = "font_color_entry"):
-        self.history_entry = LUIFormattedLabel()
-        self.history_entry.margin = (0, 0, 0, 0)
-        #self.history_entry.height = "100%"
-        #self.history_entry.width = "100%"
-        history.add(self.history_entry, "?")
-        self.history_entry.solid = True
-        self.history_entry.bind("click", self.click)
-
-        # FIXME: Choose color based on text_type
-        for text_part in text.split("\n"):
-            if text_part == "":
-                self.history_entry.newline()
-            else:
-                self.history_entry.add(text_part, font_size = 15, color = colors[color])
-                self.history_entry.newline()
-        
-        self.text = text
-        self.original_color = color
-        self.selected = False
-        
-    def click(self, lui_event):
-        #print("click!")
-        #print("  " + str(lui_event.name))        # click
-        #print("  " + str(lui_event.sender))      # <lui.LUIObject object at 0x7f1a3eb66eb8>
-        #print("  " + str(lui_event.coordinates)) # LPoint2f(58, 36)
-        #print("  " + str(lui_event.message))     #
-        self.selected = not self.selected
-        if self.selected:
-            self.history_entry.color = colors["font_color_selected_history_item"]
-            print(colors["font_color_selected_history_item"])
-        else:
-            self.history_entry.color = colors[self.original_color]
-            print(colors[self.original_color])
-
 
 class BufferingInterpreter(InteractiveInterpreter):
     def __init__(self, flush_sink, **kwargs):
@@ -241,11 +240,11 @@ class BufferingInterpreter(InteractiveInterpreter):
             self.write_sink.append(data)
     
     def showsyntaxerror(self, filename=None):
-        self.set_write_mode('font_color_syntaxerror')
+        self.set_write_mode('color_syntaxerror')
         InteractiveInterpreter.showsyntaxerror(self, filename=filename)
     
     def showtraceback(self):
-        self.set_write_mode('font_color_traceback')
+        self.set_write_mode('color_traceback')
         InteractiveInterpreter.showtraceback(self)
 
 class Console(DirectObject, BufferingInterpreter):
@@ -266,7 +265,7 @@ class Console(DirectObject, BufferingInterpreter):
             banner = interpreter_locals['console_command'].__doc__
         else:
             banner = "Python console. Have fun!"
-        self.set_write_mode("font_color_banner")
+        self.set_write_mode("color_banner")
         self.write(banner)
         self.flush()
 
@@ -279,7 +278,7 @@ class Console(DirectObject, BufferingInterpreter):
     def command(self, input_text):
         self.color_stack = None
         if input_text != '':
-            self.set_write_mode("font_color_entered")
+            self.set_write_mode("color_entered")
             self.write(input_text)
             if input_text.startswith('%'):
                 # Apply console magic
@@ -293,15 +292,15 @@ class Console(DirectObject, BufferingInterpreter):
                 input_text = 'console_command.%s(%s)' % (func, repr(arg))
                 #print(repr(input_text))
             try:
-                self.set_write_mode("font_color_weird")
+                self.set_write_mode("color_weird")
                 with self.fake_io:
                     should_continue = self.runsource(input_text)
-                self.set_write_mode("font_color_stdout")
+                self.set_write_mode("color_stdout")
                 self.write(self.fake_io.read_stdout())
-                self.set_write_mode("font_color_stderr")
+                self.set_write_mode("color_stderr")
                 self.write(self.fake_io.read_stderr())
                 if should_continue:
-                    self.set_write_mode("font_color_weird")
+                    self.set_write_mode("color_weird")
                     self.write("Input was incomplete.")
                 self.flush()
                 return should_continue

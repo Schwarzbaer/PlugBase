@@ -47,7 +47,7 @@ def build(pm):
                                                 #f1 = Foo(),
                                                 #f2 = Foo(),
                                                 console_command = console_magic))
-    plugin_manager.get_interface("console").add_console(LUIButton(text = "Python"), console.gui_window.console_frame)
+    plugin_manager.get_interface("console").add_console(LUIButton(text = "Python"), console.gui_window)
     global interface
     interface = ConsoleInterface()
 
