@@ -14,15 +14,18 @@ from plugin import configargs, get_config_value, ConfigValue#, call_on_change
 
 global base # This is just to suppress Eclipse error indicators
 
-TEXT_MARGIN = (0.03, -0.06)
-
 # Create and hide a Tk window, so that we can access the cut buffer
+# TODO: Move application creation / destruction to build/destroy-relateds
 try:
     # Python2
     import Tkinter as tk
 except ImportError:
     # Python3
     import tkinter as tk
+
+tk_window = tk.Tk()
+tk_window.withdraw()
+tk_window.clipboard_clear()
 
 # FIXME: Remember and put back the streams instead of using
 # sys.__stdio__. In case of us already working in a stream-replacing
@@ -150,6 +153,8 @@ class ConsoleHistoryItem:
 class ConsoleInput(LUIInputField, DirectObject):
     def __init__(self, interpreter):
         self.interpreter = interpreter
+        #LUIInputField.__init__(self)
+        #DirectObject.__init__(self)
         super(ConsoleInput, self).__init__()
         self.bind("tab", self.tab)
         self.bind("enter", self.enter)
@@ -159,11 +164,9 @@ class ConsoleInput(LUIInputField, DirectObject):
         self.bind("control-u", self.kill_to_start)
         self.bind("control-k", self.kill_to_end)
         self.bind("control-l", self.kill_line)
-        # TODO: Delete this debug bind
-        self.accept("set_cursor_pos", self.cp)
-    def cp(self, cursor_pos):
-        self.cursor_pos = cursor_pos
-        self._render_text()
+        # TODO: Delete this debug binds
+        self.accept("cursor_skip_left", self.cursor_skip_left)
+        self.accept("cursor_skip_right", self.cursor_skip_right)
 
     def enter(self, event):
         should_continue = self.interpreter.command(self.get_value()+"\n")
@@ -176,25 +179,22 @@ class ConsoleInput(LUIInputField, DirectObject):
         self.copy(event)
 
     def copy(self, event):
+        print("copy")
         # FIXME: If text is selected, limit to that.
-        tk_window = tk.Tk()
-        tk_window.withdraw()
         tk_window.clipboard_clear()
         tk_window.clipboard_append(self.get_value())
         print(tk_window, self.get_value(), tk_window.clipboard_get())
-        tk_window.destroy()
 
     def cut(self, event):
+        print("cut")
         # FIXME: If text is selected, limit to that.
         self.copy(event)
         self.set_value("")
 
     def paste(self, event):
         # FIXME: Add text at cursor position.
-        tk_window = tk.Tk()
-        tk_window.withdraw()
+        print("paste")
         print(tk_window.clipboard_get())
-        tk_window.destroy()
 
     def kill_to_start(self):
         # FIXME: Implement
@@ -272,6 +272,7 @@ class Console(DirectObject, BufferingInterpreter):
     def destroy(self):
         self.gui_window.destroy()
         self.fake_io = None
+        tk_window.destroy()
 
     # Python Interpreter-relevant methods
 

@@ -55,6 +55,8 @@ class ConfigConsole(DirectObject):
 
         for section in get_config_sections():
             section_cell = GUISectionCell(section, self.gui_layout)
+        
+        self.gui_root.ls()
 
     def get_gui(self):
         return self.gui_root

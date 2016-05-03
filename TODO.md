@@ -48,7 +48,6 @@ Towards 1.0
     * Harden %magic commands against wrong commands and similar
       erroneous input.
   * Improvements depending on improvements to LUI
-    * Unset focus on input when console hides
     * Implement editing keystrokes (copy, paste, ...)
 * Task / Event console
   * Composing and sending events
@@ -65,6 +64,7 @@ Towards 1.0
   * List and exemplars of objects in pools.
   * Create inspection interfaces, i.e. for ModelPool
 * Python console
+  * LUI-dependant: Hook up keystrokes to copy/paste/cut etc.
   * Interpreter: Input
     * If an input was incomplete, caused a syntax error or
       traceback, it should not be written to history, and the input
@@ -127,6 +127,11 @@ Towards 1.0
       manually, and at the end restores the original state.
 * Capabilities checking
   * See GSG and GraphicsPipe API.
+    * base.win.gsg.*
+    * base.pipe.display_information.*
+  * Create table
+  * Add button to dump data to file, or upload error report via HTTP
+  * Add filter
 * Game element flow
 * Graphics packages
 * Jailed Python Interpreter for game objects

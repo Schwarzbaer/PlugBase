@@ -7,6 +7,8 @@ from panda3d.lui import LUIRegion, LUIInputHandler
 from LUISkin import LUIDefaultSkin
 from LUITabbedFrame import LUITabbedFrame
 
+from plugin import ConfigValue
+
 global base
 global plugin_manager
 global interface
@@ -32,14 +34,18 @@ class ConsoleFrame(DirectObject):
         handler = LUIInputHandler()
         base.mouseWatcher.attach_new_node(handler)
         region.set_input_handler(handler)
-    
-        tabbed_frame = LUITabbedFrame(parent = region.root)
-        tabbed_frame.pos = (0, 0)
-        tabbed_frame.width = "100%"
-        tabbed_frame.height = "100%"
-        tabbed_frame.margin = 20
-        tabbed_frame.style = LUITabbedFrame.FS_raised
-        self.frame = tabbed_frame
+        
+        self.width = ConfigValue("console", "width", self._set_width)
+        self.height = ConfigValue("console", "height", self._set_height)
+        self.alpha = ConfigValue("console", "alpha", self._set_alpha)
+        
+        self.frame = LUITabbedFrame(parent = region.root)
+        self.frame.pos = (0, 0)
+        self.frame.width = "{}%".format(int(self.width.get() * 100))
+        self.frame.height = "{}%".format(int(self.height.get() * 100))
+        self.frame.margin = 20
+        self.frame.style = LUITabbedFrame.FS_raised
+        self.frame.alpha = self.alpha.get()
 
         self.visible = False
         self.frame.hide()
@@ -58,6 +64,15 @@ class ConsoleFrame(DirectObject):
             self.visible = True
             self.frame.trigger_event("expose")
         self.frame.set_visible(self.visible)
+
+    def _set_width(self, value):
+        self.frame.width = "{}%".format(int(value * 100))
+
+    def _set_height(self, value):
+        self.frame.height = "{}%".format(int(value * 100))
+
+    def _set_alpha(self, value):
+        self.frame.alpha = value
 
     def add_console(self, button, window):
         return self.frame.add(button, window)
