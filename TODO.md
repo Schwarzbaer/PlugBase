@@ -1,7 +1,6 @@
 Small stuff
 -----------
 * Move %pl* magic into console_plugins code
-* Make PluginManager.active_plugins a set
 
 Towards 1.0
 -----------

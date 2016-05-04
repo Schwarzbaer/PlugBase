@@ -27,7 +27,7 @@ class PluginNotBuilt(Exception):
 class PluginManager:
     def __init__(self, config_files = None):
         self.plugins = {}
-        self.active_plugins = []
+        self.active_plugins = set()
         self.extenders = {} # "extender": set(extendees
         global config_manager
         config_manager = ConfigManager(config_files)
@@ -60,6 +60,13 @@ class PluginManager:
         assert extender in self.extenders, "Extender not registered"
         del self.extenders[extender]
     
+    def _get_dependencies(self, plugin_name):
+        assert plugin_name in self.plugins, "Plugin not loaded"
+        if hasattr(self.plugins[plugin_name], "dependencies"):
+            return self.plugins[plugin_name].dependencies
+        else:
+            return []
+    
     def _get_dependants(self, root_plugin_name, only_actives=True):
         # TODO: Respect only_actives
         dependants = [root_plugin_name]
@@ -68,8 +75,7 @@ class PluginManager:
             dependants_added = False
             for plugin_name, plugin in self.plugins.iteritems():
                 if not only_actives or plugin_name in self.active_plugins:
-                    plugin_deps = plugin.dependencies
-                    if any([dep in dependants for dep in plugin_deps]):
+                    if any([dep in dependants for dep in self._get_dependencies(plugin_name)]):
                         if plugin_name not in dependants:
                             dependants.append(plugin_name)
                             dependants_added = True
@@ -156,7 +162,7 @@ class PluginManager:
                 deps = []
             if all([d in self.active_plugins for d in deps]):
                 self.plugins[plugin_name].build(self)
-                self.active_plugins.append(plugin_name)
+                self.active_plugins.add(plugin_name)
                 for extender in self._get_extenders(plugin_name, only_actives=True):
                     self.plugins[extender].extend(plugin_name)
                 for extendee in self._get_extendees(plugin_name, only_actives=True):
@@ -207,7 +213,7 @@ class PluginManager:
         for extender in self._get_extenders(plugin_name):
             self.plugins[extender].unextend(plugin_name)
         self.plugins[plugin_name].destroy()
-        del self.active_plugins[self.active_plugins.index(plugin_name)]
+        self.active_plugins.remove(plugin_name)
 
     # TODO: destroy_pligins
     
