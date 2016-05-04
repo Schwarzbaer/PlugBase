@@ -54,7 +54,7 @@ class ConfigConsole(DirectObject):
         self.gui_layout.set_debug_name("gui_layout")
 
         for section in get_config_sections():
-            section_cell = GUISectionCell(section, self.gui_layout)
+            GUISection(section, self.gui_layout)
         
         self.gui_root.ls()
 
@@ -69,48 +69,60 @@ class ConfigConsole(DirectObject):
         self.gui_root.ls()
 
 
-class GUISectionCell:
+class GUISection:
     def __init__(self, section, layout):
         header_color = ConfigValue("console_config", "color_section", self.update_header_color)
+        
         self.section_header = LUILabel(text=section, font_size=20, color=header_color.get())
+        #self.section_header.height = "100%"
+        self.section_header.width = "100%"
         self.section_header.set_debug_name("section_header")
         layout.add(self.section_header)
+        
         for var, _ in get_config_variables(section):
-            cell = GUIVariableCell(section, var)
-            layout.add(cell.root_obj)
+            layout.add(GUIVariableCell(section, var))
     
     def update_header_color(self, value):
         self.section_header.color = value
 
 
-class GUIVariableCell:
+class GUIVariableCell(LUIObject):
     def __init__(self, section, variable):
+        super(GUIVariableCell, self).__init__()
+        self.set_debug_name("var_line")
+        #self.height = "100%"
+        self.width = "100%"
+        elem_height = False
+        
         self.color_variable = ConfigValue("console_config", "color_variable", self.change_var_name_color)
         self.color_value = ConfigValue("console_config", "color_value", self.change_var_value_color)
         self.mode = 0 # 0 for display, 1 for entry
-        self.value = ConfigValue(section, variable, self.value_updated)
-        self.root_obj = LUIObject()
-        self.root_obj.set_debug_name("var_line")
-        self.root_obj.width = "100%"
-        self.var_layout = LUIHorizontalLayout(parent = self.root_obj)
+        
+        self.var_layout = LUIHorizontalLayout(parent = self)
+        #if elem_height: self.var_layout.height = "100%"
         self.var_layout.width = "100%"
 
         self.var_name = LUIFormattedLabel()
+        if elem_height: self.var_name.height = "100%"
+        self.var_name.width = "100%"
         self.var_name.set_debug_name("var_name")
         self.var_name.add(variable, color=self.color_variable.get())
         self.var_layout.add(self.var_name, "15%")
         
+        self.value = ConfigValue(section, variable, self.value_updated)
         self.var_value = LUILabel()
-        #self.var_value = LUIFormattedLabel()
         self.var_value.set_debug_name("var_value")
+        if elem_height: self.var_value.height = "100%"
+        #self.var_value.width = "100%"
         self.var_value.set_text(repr(self.value.get()))
-        #self.var_value.add(str(self.value.get()), color=(0.93, 0.93, 0.93))
         self.var_value.solid = True
         self.var_value.bind("click", self.toggle_mode)
-        self.var_layout.add(self.var_value)#, "85%")
+        self.var_layout.add(self.var_value)
         
         self.var_value_entry = LUIInputField()
         self.var_value_entry.set_debug_name("var_value_input")
+        if elem_height: self.var_value_entry.height = "100%"
+        #self.var_value_entry.width = "100%"
         self.var_value_entry.margin = (-6, 0, 0, -6)
         self.var_value_entry.set_value(repr(self.value.get()))
         self.var_value_entry.bind("enter", self.enter_new_value)
