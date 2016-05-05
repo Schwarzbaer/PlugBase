@@ -171,7 +171,7 @@ class ConsoleInput(LUIInputField, DirectObject):
     def enter(self, event):
         should_continue = self.interpreter.command(self.get_value()+"\n")
         if not should_continue:
-            self.set_value("")
+            self.value = ""
 
     def tab(self, event):
         # FIXME: Implement
@@ -189,7 +189,7 @@ class ConsoleInput(LUIInputField, DirectObject):
         print("cut")
         # FIXME: If text is selected, limit to that.
         self.copy(event)
-        self.set_value("")
+        self.value = ""
 
     def paste(self, event):
         # FIXME: Add text at cursor position.

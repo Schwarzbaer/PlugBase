@@ -124,7 +124,7 @@ class GUIVariableCell(LUIObject):
         if elem_height: self.var_value_entry.height = "100%"
         #self.var_value_entry.width = "100%"
         self.var_value_entry.margin = (-6, 0, 0, -6)
-        self.var_value_entry.set_value(repr(self.value.get()))
+        self.var_value_entry.value = repr(self.value.get())
         self.var_value_entry.bind("enter", self.enter_new_value)
         self.var_layout.add(self.var_value_entry)#, "85%")
         
@@ -153,7 +153,7 @@ class GUIVariableCell(LUIObject):
 
     def value_updated(self, value):
         self.var_value.set_text(repr(value))
-        self.var_value_entry.set_value(repr(value))
+        self.var_value_entry.value = repr(value)
 
     def change_var_name_color(self, value):
         self.var_name.color = value
