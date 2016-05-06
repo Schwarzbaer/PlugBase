@@ -77,14 +77,29 @@ class GUISection:
         #self.section_header.height = "100%"
         self.section_header.width = "100%"
         self.section_header.set_debug_name("section_header")
+        self.section_header.solid = True
+        self.section_header.bind("click", self.toggle_line_visibility)
         layout.add(self.section_header)
+        self.var_lines_visible = True
+        self.var_lines = []
         
         for var, _ in get_config_variables(section):
-            layout.add(GUIVariableCell(section, var))
+            var_line = GUIVariableCell(section, var)
+            layout.add(var_line)
+            self.var_lines.append(var_line)
     
     def update_header_color(self, value):
         self.section_header.color = value
 
+    def toggle_line_visibility(self, event):
+        print("toggle")
+        self.var_lines_visible = not self.var_lines_visible
+        if self.var_lines_visible:
+            for line in self.var_lines:
+                line.show()
+        else:
+            for line in self.var_lines:
+                line.hide()
 
 class GUIVariableCell(LUIObject):
     def __init__(self, section, variable):
