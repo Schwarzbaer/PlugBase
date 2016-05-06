@@ -40,14 +40,6 @@ Towards 1.0
 * Every console
   * Improve docstrings.
   * Pull appearance vars from config_manager
-* console
-  * Interpreter %magic
-    * Improve docstring format, so that there's no more whitespaces
-      an the beginning of lines.
-    * Harden %magic commands against wrong commands and similar
-      erroneous input.
-  * Improvements depending on improvements to LUI
-    * Implement editing keystrokes (copy, paste, ...)
 * Task / Event console
   * Composing and sending events
   * adding listeners to DirectObjects; base.messenger._getEvents()
@@ -63,6 +55,11 @@ Towards 1.0
   * List and exemplars of objects in pools.
   * Create inspection interfaces, i.e. for ModelPool
 * Python console
+  * Interpreter %magic
+    * Improve docstring format, so that there's no more whitespaces
+      an the beginning of lines.
+    * Harden %magic commands against wrong commands and similar
+      erroneous input.
   * LUI-dependant: Hook up keystrokes to copy/paste/cut etc.
   * Interpreter: Input
     * If an input was incomplete, caused a syntax error or
