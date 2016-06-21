@@ -420,7 +420,7 @@ class ConsoleCommands:
 
     @tokenize_magic()
     def testargs(self, *args, **kwargs):
-        """helper function to test argument-passing to %commands.
+        """helper function to tests argument-passing to %commands.
         
         This method prints the arguments given to it, and their type.
         """
